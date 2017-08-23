@@ -1,36 +1,36 @@
-<form #rp10Form="ngForm" class="form" (ngSubmit)="onSubmit(rp10Form.value)">
+<form class="form" [formGroup]="form" (ngSubmit)="onSubmit(rp10Form.value)" novalidate>
 
   <pre>
-{{diagnostic}}
+{{ form.value | json }}
   </pre>
 
   <div class="form-control">
     <label>Today's repeats ___'s</label>
-    <md-select class="form-control" [(ngModel)]="model.todaysRepeats" name="todaysRepeats">
+    <md-select class="form-control" formControlName="todaysRepeats" name="todaysRepeats">
       <md-option *ngFor="let repeat of repeatChoices" [value]="repeat">{{repeat}}</md-option>
     </md-select>
   </div>
 
   <md-input-container class="form-control">
     <label># of reps</label>
-    <input mdInput [(ngModel)]="model.ofReps" type="text" name="ofReps">
+    <input mdInput formControlName="ofReps" type="text" name="ofReps">
   </md-input-container>
 
-  <md-input-container class="form-control">
+  <md-input-container class="form-control" formGroupName="secondsRestPerRepeat">
     <label># of seconds rest per repeat</label>
-    <input mdInput [(ngModel)]="model.secondsRestPerRepeat" type="text" name="secondsRestPerRepeat">
+    <input mdInput type="text" name="secondsRestPerRepeat">
   </md-input-container>
 
-  <app-goal-times name="goalTimes" [(ngModel)]="model.goalTimes"></app-goal-times>
+  <app-goal-times name="goalTimes" formControlName="goalTimes"></app-goal-times>
 
-  <md-radio-group class="form-control radio-group" [(ngModel)]="model.myGoalTimeIsFor" name="myGoalTimeIsFor">
+  <md-radio-group class="form-control radio-group" formControlName="myGoalTimeIsFor" name="myGoalTimeIsFor">
     <label class="radio-group-label">My goal time is for:</label>
     <md-radio-button *ngFor="let poolLength of poolLengthChoices" [value]="poolLength">
       {{poolLength}}
     </md-radio-button>
   </md-radio-group>
 
-  <md-radio-group class="form-control radio-group" [(ngModel)]="model.todayMyTrainingPoolIs" name="todayMyTrainingPoolIs">
+  <md-radio-group class="form-control radio-group" formControlName="todayMyTrainingPoolIs" name="todayMyTrainingPoolIs">
     <label class="radio-group-label">Today my training pool is:</label>
     <md-radio-button *ngFor="let poolLength of poolLengthChoices" [value]="poolLength">
       {{poolLength}}
@@ -40,6 +40,5 @@
   <button class="form-control" md-raised-button type="submit">
     Submit
   </button>
-
 
 </form>

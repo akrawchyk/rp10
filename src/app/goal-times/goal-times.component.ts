@@ -1,18 +1,34 @@
 import * as moment from 'moment'
 
 import { Component, Input, OnInit, forwardRef } from '@angular/core'
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
+import {
+  FormControl,
+  ControlValueAccessor,
+  NG_VALUE_ACCESSOR,
+  NG_VALIDATORS
+} from '@angular/forms'
 
 import { GoalTime } from '../rp10'
+
+function createGoalTimeStringsValidator() {
+  return function goalTimeStringsValidator(control: FormControl) {
+    try {
+      const read = control.value.split('\n').map(GoalTime.fromString)
+      return null
+    } catch (e) {
+      return { formatting: { value: control.value } }
+    }
+  }
+}
 
 @Component({
   selector: 'app-goal-times',
   template: `
     <md-input-container class="form-control">
       <label>Up to 10 goal times (with distance)</label>
-      <textarea #goalTimes mdInput [(ngModel)]="_displayValue" (blur)="onBlur(goalTimes.value)"></textarea>
-      <md-error *ngIf="_errorMessage">
-        {{_errorMessage}}
+      <textarea mdInput [(ngModel)]="_displayValue" (blur)="onBlur($event)"></textarea>
+      <md-error>
+        Expected input format to be \`mm:ss:msms\`
       </md-error>
     </md-input-container>
   `,
@@ -21,16 +37,20 @@ import { GoalTime } from '../rp10'
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => GoalTimesComponent),
       multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => GoalTimesComponent),
+      multi: true
     }
   ],
   styleUrls: ['./goal-times.component.scss']
 })
 export class GoalTimesComponent implements OnInit, ControlValueAccessor {
-  constructor() {}
-
   @Input('value') _value: GoalTime[] = []
   _displayValue: string = ''
-  _errorMessage: string = ''
+
+  validateFn: Function
 
   get value() {
     return this._value
@@ -41,9 +61,15 @@ export class GoalTimesComponent implements OnInit, ControlValueAccessor {
     this.propagateChange(this._value)
   }
 
-  propagateChange: any = () => {}
+  ngOnInit() {
+    this.validateFn = createGoalTimeStringsValidator()
+  }
 
-  ngOnInit() {}
+  valiate(control: FormControl) {
+    return this.validateFn(control)
+  }
+
+  propagateChange: any = () => {}
 
   writeValue(val: GoalTime[]) {
     if (val && val.length) {
@@ -58,16 +84,19 @@ export class GoalTimesComponent implements OnInit, ControlValueAccessor {
 
   registerOnTouched() {}
 
-  onBlur(displayVal) {
-    this._errorMessage = ''
+  onBlur(event: any) {
+    let displayValue = event.target.value
 
-    try {
-      const read = displayVal.split('\n').map(GoalTime.fromString)
-      this._value = read
-    } catch (err) {
-      // FIXME display errors in template
-      this._errorMessage = err.message
-      console.log(err.message)
+    if (displayValue && displayValue.trim()) {
+      displayValue = displayValue.trim()
+
+      try {
+        const read = displayValue.split('\n').map(GoalTime.fromString)
+        this.value = read
+      } catch (err) {
+        // FIXME display errors in template
+        console.log(err.message)
+      }
     }
   }
 
