@@ -1,4 +1,5 @@
-const DURATION_RE = /^(\d{0,2}:)?\d{2}(\.\d{0,2})?$/
+const GOAL_DURATION_RE = /^(\d{0,2}:)?\d{2}(\.\d{0,2})?$/
+const GOAL_DISTANCES_LIST = [1650, 1500, 800, 500, 400, 200, 100, 50]
 
 export class GoalTime {
   constructor(
@@ -16,12 +17,14 @@ export class GoalTime {
     const duration = read[0].trim()
     const distance = +(read[1].trim())
 
-    if (!duration || duration.search(DURATION_RE) === -1) {
+    if (!duration || duration.search(GOAL_DURATION_RE) === -1) {
       throw new TypeError(`GoalTime.fromString expected duration format to be \`mm:ss.msms\`, got \`${read[0]}\``)
     }
 
     if (!distance || isNaN(distance)) {
       throw new TypeError(`GoalTime.fromString expected distance to be coerable to number, got \`${read[1]}\``)
+    } else if (!GOAL_DISTANCES_LIST.includes(distance)) {
+      throw new TypeError(`GoalTime.fromString expected distance to be one of ${GOAL_DISTANCES_LIST}, got \`${read[1]}\``)
     }
 
     return new GoalTime(duration, distance)

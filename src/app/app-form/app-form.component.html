@@ -21,10 +21,14 @@
     <input mdInput type="text" formControlName="secondsRestPerRepeat">
   </md-input-container>
 
-  <app-goal-times name="goalTimes" formControlName="goalTimes"></app-goal-times>
+  <div class="form-control">
+    <app-goal-times name="goalTimes" formControlName="goalTimes"></app-goal-times>
 
-  <!-- FIXME display this in the app-goal-times component's md-error -->
-  <p *ngIf="form.controls.goalTimes.hasError('formatting')">{{form.controls.goalTimes.errors.formatting.message}}</p>
+    <!-- FIXME display this in the app-goal-times component's md-error -->
+    <p class="message message--error" *ngIf="form.controls.goalTimes.hasError('formatting')">
+      {{form.controls.goalTimes.errors.formatting.message}}
+    </p>
+  </div>
 
   <md-radio-group class="form-control radio-group" formControlName="myGoalTimeIsFor">
     <label class="radio-group-label">My goal time is for:</label>

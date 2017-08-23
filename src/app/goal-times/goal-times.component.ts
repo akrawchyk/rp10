@@ -33,7 +33,7 @@ function createGoalTimeStringsValidator(): ValidatorFn {
 @Component({
   selector: 'app-goal-times',
   template: `
-    <md-input-container class="form-control">
+    <md-input-container>
       <label>Up to 10 goal times (with distance)</label>
       <textarea mdInput [(ngModel)]="value"></textarea>
     </md-input-container>

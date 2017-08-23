@@ -41,6 +41,13 @@ label {
   max-width: 940px;
 }
 
+.message {
+}
+
+.message--error {
+  color: red;
+}
+
 .form {
   display: flex;
   flex-direction: column;
