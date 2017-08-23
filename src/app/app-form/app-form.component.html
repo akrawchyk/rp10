@@ -1,10 +1,8 @@
-<form #rp10Form="ngForm" class="form">
+<form #rp10Form="ngForm" class="form" (ngSubmit)="onSubmit(rp10Form.value)">
 
-  <p>
-    <code>
-      {{diagnostic}}
-    </code>
-  </p>
+  <pre>
+{{diagnostic}}
+  </pre>
 
   <div class="form-control">
     <label>Today's repeats ___'s</label>
@@ -23,10 +21,7 @@
     <input mdInput [(ngModel)]="model.secondsRestPerRepeat" type="text" name="secondsRestPerRepeat">
   </md-input-container>
 
-  <md-input-container class="form-control">
-    <label>Up to 10 goal times (with distance)</label>
-    <textarea mdInput [(ngModel)]="model.goalTimes" name="goalTimes"></textarea>
-  </md-input-container>
+  <app-goal-times name="goalTimes" [(ngModel)]="model.goalTimes"></app-goal-times>
 
   <md-radio-group class="form-control radio-group" [(ngModel)]="model.myGoalTimeIsFor" name="myGoalTimeIsFor">
     <label class="radio-group-label">My goal time is for:</label>

@@ -13,9 +13,10 @@ import {
 
 import { AppComponent } from './app.component'
 import { AppFormComponent } from './app-form/app-form.component'
+import { GoalTimesComponent } from './goal-times/goal-times.component'
 
 @NgModule({
-  declarations: [AppComponent, AppFormComponent],
+  declarations: [AppComponent, AppFormComponent, GoalTimesComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,

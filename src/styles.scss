@@ -28,6 +28,13 @@ $rp10-app-theme: mat-light-theme($rp10-app-primary, $rp10-app-accent, $rp10-app-
 // that you are using.
 @include angular-material-theme($rp10-app-theme);
 
+pre {
+  overflow-x: scroll;
+}
+
+label {
+  display: inline-block;
+}
 
 .wrap {
   margin: 0 auto;
