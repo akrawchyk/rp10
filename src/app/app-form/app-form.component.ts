@@ -18,17 +18,17 @@ export class AppFormComponent {
   // model = new RP10(50, 20, 0, 'SCY', 'SCM', 1, 25, [
   // ])
 
-  goalTimes = [
+  goalTimes: GoalTime[] = [
     new GoalTime('1:42.0', 200),
     new GoalTime('53.7', 100),
-    new GoalTime('23.41', 50),
-    new GoalTime('5:00', 500),
-    new GoalTime('4:08.02', 500),
-    new GoalTime('26', 50),
-    new GoalTime('33', 50),
-    new GoalTime('32', 50),
-    new GoalTime('32', 50),
-    new GoalTime('40', 50)
+    // new GoalTime('23.41', 50),
+    // new GoalTime('5:00', 500),
+    // new GoalTime('4:08.02', 500),
+    // new GoalTime('26', 50),
+    // new GoalTime('33', 50),
+    // new GoalTime('32', 50),
+    // new GoalTime('32', 50),
+    // new GoalTime('40', 50)
   ]
 
   form: FormGroup
@@ -44,7 +44,8 @@ export class AppFormComponent {
       todayMyTrainingPoolIs: '',
       ofGoalPaceToTrainToday: 0,
       secondsRestPerRepeat: 0,
-      goalTimes: [this.goalTimes]
+      // use text representation for textarea input
+      goalTimes: this.goalTimes.map(goalTime => goalTime.toString()).join('\n')
     })
   }
 
