@@ -13,10 +13,11 @@ import {
 
 import { AppComponent } from './app.component'
 import { AppFormComponent } from './app-form/app-form.component'
-import { GoalTimesComponent } from './goal-times/goal-times.component'
+import { GoalTimesComponent } from './goal-times/goal-times.component';
+import { PracticeGroupsComponent } from './practice-groups/practice-groups.component'
 
 @NgModule({
-  declarations: [AppComponent, AppFormComponent, GoalTimesComponent],
+  declarations: [AppComponent, AppFormComponent, GoalTimesComponent, PracticeGroupsComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,

@@ -1,5 +1,3 @@
-import * as moment from 'moment'
-
 import { Component, Input, OnInit, forwardRef } from '@angular/core'
 import {
   FormControl,
