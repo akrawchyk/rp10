@@ -41,9 +41,9 @@ export class AppFormComponent {
       ofReps: [20, Validators.required],
       goalPlusMinus: [-5, Validators.required],
       myGoalTimeIsFor: ['SCY', Validators.required],
-      todayMyTrainingPoolIs: ['SCY', Validators.required],
+      todayMyTrainingPoolIs: ['SCM', Validators.required],
       ofGoalPaceToTrainToday: [50, Validators.required],
-      secondsRestPerRepeat: [25, Validators.required],
+      restPerRepeatS: [25, Validators.required],
       // use text representation for textarea input
       goalTimes: [this.goalTimes.map(goalTime => goalTime.toString()).join('\n'), Validators.required]
       // eventGoalTime?: number,
@@ -60,12 +60,16 @@ export class AppFormComponent {
       myGoalTimeIsFor,
       todayMyTrainingPoolIs,
       ofGoalPaceToTrainToday,
-      secondsRestPerRepeat,
+      restPerRepeatS,
       goalTimes
     } = this.form.value
 
     goalTimes = GoalTime.fromStringList(goalTimes)
-    this.rp10 = new Rp10(todaysRepeats, ofReps, goalPlusMinus, myGoalTimeIsFor, todayMyTrainingPoolIs, ofGoalPaceToTrainToday, secondsRestPerRepeat, goalTimes)
+    this.rp10 = new Rp10(todaysRepeats, ofReps, goalPlusMinus, myGoalTimeIsFor, todayMyTrainingPoolIs, ofGoalPaceToTrainToday, restPerRepeatS, goalTimes)
     this.submitted = true
+  }
+
+  reset() {
+    this.submitted = false
   }
 }

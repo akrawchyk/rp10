@@ -32,8 +32,8 @@ function createGoalTimeStringsValidator(): ValidatorFn {
   selector: 'app-goal-times',
   template: `
     <md-input-container>
-      <label>Up to 10 goal times (with distance)</label>
-      <textarea mdInput [(ngModel)]="value"></textarea>
+      <label>Up to 10 goal times (with distance, e.g <kbd>2:01.49 200</kbd>)</label>
+      <textarea mdInput [(ngModel)]="value" rows=10></textarea>
     </md-input-container>
   `,
   providers: [

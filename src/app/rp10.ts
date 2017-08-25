@@ -52,12 +52,42 @@ export class GoalTime {
 }
 
 export class PracticePace {
-  constructor(public target: string, public interval: string) {}
+  constructor(public targetS: number, public intervalS: number) {}
 }
 
 export class PracticeGroup {
   // data for outputs
   constructor(public goalTime: GoalTime, public practicePace: PracticePace) {}
+}
+
+const POOLS = {
+  SCY: 0,
+  SCM: 1,
+  LCM: 2
+}
+
+const TIMES = {
+  [POOLS.SCY]: moment.duration('00:3:33.42').asSeconds(),
+  [POOLS.SCM]: moment.duration('00:3:55.50').asSeconds(),
+  [POOLS.LCM]: moment.duration('00:4:03.84').asSeconds()
+}
+
+const POOL_LENGTH_FACTORS = [POOLS.SCY, POOLS.SCM, POOLS.LCM].map(poolLength => {
+  return [
+    TIMES[poolLength] / TIMES[POOLS.SCY],
+    TIMES[poolLength] / TIMES[POOLS.SCM] ,
+    TIMES[poolLength] / TIMES[POOLS.LCM]
+  ]
+})
+
+function poolLength(fromLength) {
+  let _fromLength = fromLength
+
+  return {
+    to: (toLength) => {
+      return POOL_LENGTH_FACTORS[POOLS[_fromLength]][POOLS[toLength]]
+    }
+  }
 }
 
 export class Rp10 {
@@ -69,7 +99,7 @@ export class Rp10 {
     public myGoalTimeIsFor: string,
     public todayMyTrainingPoolIs: string,
     public ofGoalPaceToTrainToday: number,
-    public secondsRestPerRepeat: number,
+    public restPerRepeatS: number,
     public goalTimes: GoalTime[],
     public eventGoalTime?: number,
     public goalEventDistance?: number,
@@ -79,7 +109,7 @@ export class Rp10 {
   // TODO getter/setter for percentage units
 
   // XXX this implementation matches the google sheet
-  getSheetPaceToTrainToday(goalTime: GoalTime): number {
+  getPaceToTrainTodayS(goalTime: GoalTime): number {
     const split = goalTime.duration.split(':')
     while (split.length < 3) {
       split.unshift('00') // to 00:00:00.000 format, https://momentjs.com/docs/#/durations/creating/
@@ -89,32 +119,39 @@ export class Rp10 {
     const ofGoalPaceS = moment
       .duration(`00:${ofGoalPaceM}:${m.seconds()}.${m.milliseconds()}`)
       .asSeconds()
+
     return (
       ofGoalPaceS /
         goalTime.distance *
         this.todaysRepeats *
-        1.10345797 /* distanceFactor */ +
+        poolLength(this.todayMyTrainingPoolIs).to(this.myGoalTimeIsFor) +
       this.goalPlusMinus
     )
   }
 
-  // XXX think i found a bug in the sheet where % of goal pace is only accounted for if the goal time duration is >=1:00.0
-  // XXX because goal +/- is only factored into the goal duration minutes place
-  getPaceToTrainToday(goalTime: GoalTime): number {
-    // TODO factor in distance conversion value
-    const split = goalTime.duration.split(':')
-    while (split.length < 3) {
-      split.unshift('00') // to 00:00:00.000 format, https://momentjs.com/docs/#/durations/creating/
-    }
-    const m = moment.duration(split.join(':'))
-    const ofGoalPaceS =
-      m.asSeconds() * (1 / (this.ofGoalPaceToTrainToday / 100))
-    return (
-      ofGoalPaceS /
-        goalTime.distance *
-        this.todaysRepeats *
-        1.10345797 /* distanceFactor */ +
-      this.goalPlusMinus
-    )
+  getSheetPracticePace(goalTime: GoalTime): PracticePace {
+    const paceToTrainTodayS = this.getPaceToTrainTodayS(goalTime)
+    const interval = moment.duration(paceToTrainTodayS + this.restPerRepeatS, 'seconds')
+    return new PracticePace(paceToTrainTodayS, +Math.ceil(interval.asSeconds()))
   }
+
+  // XXX % of goal pace is only accounted for if the goal time duration is >=1:00.0
+  // XXX because goal +/- is only factored into the goal duration minutes place
+  // getPaceToTrainToday(goalTime: GoalTime): number {
+  //   // TODO factor in distance conversion value
+  //   const split = goalTime.duration.split(':')
+  //   while (split.length < 3) {
+  //     split.unshift('00') // to 00:00:00.000 format, https://momentjs.com/docs/#/durations/creating/
+  //   }
+  //   const m = moment.duration(split.join(':'))
+  //   const ofGoalPaceS =
+  //     m.asSeconds() * (1 / (this.ofGoalPaceToTrainToday / 100))
+  //   return (
+  //     ofGoalPaceS /
+  //       goalTime.distance *
+  //       this.todaysRepeats *
+  //       poolLength(this.todayMyTrainingPoolIs).to(this.myGoalTimeIsFor) +
+  //     this.goalPlusMinus
+  //   )
+  // }
 }

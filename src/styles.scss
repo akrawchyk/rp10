@@ -34,12 +34,35 @@ pre {
 
 label {
   display: inline-block;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.mat-radio-label {
+  font-weight: normal;
+}
+
+img {
+  max-width: 100%;
 }
 
 .wrap {
   margin: 0 auto;
-  max-width: 940px;
+  width: 80%;
+  max-width: 600px;
 }
+
+.logo {
+  background-color: white;
+  border-radius: 50%;
+  height: 45px;
+  margin-right: 0.5rem;
+  width: 45px;
+}
+
+  .logo-img {
+    transform: scale(0.75)
+  }
 
 .message {
 }
@@ -51,6 +74,8 @@ label {
 .form {
   display: flex;
   flex-direction: column;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }
 
   .form-control {

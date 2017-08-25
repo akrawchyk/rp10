@@ -4,6 +4,8 @@ import { NgModule } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 
 import {
+  MdListModule,
+  MdCardModule,
   MdToolbarModule,
   MdButtonModule,
   MdRadioModule,
@@ -23,6 +25,8 @@ import { PracticeGroupsComponent } from './practice-groups/practice-groups.compo
     BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
+    MdListModule,
+    MdCardModule,
     MdToolbarModule,
     MdButtonModule,
     MdRadioModule,
