@@ -53,6 +53,10 @@ export class AppFormComponent {
   }
 
   onSubmit() {
+    if (!this.form.valid) {
+      return
+    }
+
     let {
       todaysRepeats,
       ofReps,

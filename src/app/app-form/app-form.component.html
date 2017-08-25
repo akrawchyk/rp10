@@ -47,7 +47,7 @@
       </md-radio-button>
     </md-radio-group>
 
-    <button md-raised-button (click)="onSubmit()" color="primary" type="button">
+    <button md-raised-button (click)="onSubmit()" [disabled]="!form.valid" color="primary" type="button">
       Submit
     </button>
 
