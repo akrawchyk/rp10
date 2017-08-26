@@ -18,7 +18,7 @@ export class AppFormComponent implements OnInit {
   poolLengthChoices = ['SCY', 'SCM', 'LCM']
 
   goalTimes: GoalTime[] = [
-    new GoalTime('1:42.0', 200),
+    new GoalTime('1:42.0', 200, 'John G'),
     new GoalTime('53.7', 100),
     new GoalTime('23.41', 50),
     new GoalTime('5:00', 500),

@@ -18,7 +18,7 @@ import { Rp10 } from '../rp10'
         <md-list>
           <md-list-item>Target: {{group.targetDisplay}}</md-list-item>
           <md-list-item>Interval: {{group.intervalDisplay}}</md-list-item>
-          <md-list-item>Goal event: {{group.goalTime.distance}} @ {{group.goalTime.duration}}</md-list-item>
+          <md-list-item>Goal event: {{group.goalTime.distance}}{{group.goalPoolType}} @ {{group.goalTime.duration}}</md-list-item>
           <md-list-item>Total set time: {{group.totalSetTime}}</md-list-item>
         </md-list>
       </md-card-content>
@@ -49,6 +49,7 @@ export class PracticeGroupsComponent implements OnInit, OnChanges {
         const practicePace = this.rp10.getSheetPracticePace(goalTime)
         return {
           goalTime,
+          goalPoolType: this.rp10.myGoalTimeIsFor[this.rp10.myGoalTimeIsFor.length - 1].toLowerCase(),
           targetDisplay: this._formatTimeDisplay(practicePace.targetS),
           intervalDisplay: this._formatTimeDisplay(practicePace.intervalS),
           totalSetTime: this._formatTimeDisplay(practicePace.intervalS * this.rp10.repCount)

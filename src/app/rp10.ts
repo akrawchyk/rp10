@@ -3,6 +3,36 @@ import * as moment from 'moment'
 const GOAL_DURATION_RE = /^(\d{0,2}:)?\d{2}(\.\d{0,2})?$/
 const GOAL_DISTANCES_LIST = [1650, 1500, 800, 500, 400, 200, 100, 50]
 
+const POOLS = {
+  SCY: 0,
+  SCM: 1,
+  LCM: 2
+}
+
+const TIMES = {
+  [POOLS.SCY]: moment.duration('00:3:33.42').asSeconds(),
+  [POOLS.SCM]: moment.duration('00:3:55.50').asSeconds(),
+  [POOLS.LCM]: moment.duration('00:4:03.84').asSeconds()
+}
+
+const POOL_LENGTH_FACTORS = [POOLS.SCY, POOLS.SCM, POOLS.LCM].map(poolType => {
+  return [
+    TIMES[poolType] / TIMES[POOLS.SCY],
+    TIMES[poolType] / TIMES[POOLS.SCM] ,
+    TIMES[poolType] / TIMES[POOLS.LCM]
+  ]
+})
+
+function poolType(fromLength) {
+  const _fromLength = fromLength
+
+  return {
+    to: (toLength) => {
+      return POOL_LENGTH_FACTORS[POOLS[_fromLength]][POOLS[toLength]]
+    }
+  }
+}
+
 export class GoalTime {
   // TODO convert duration to a moment duration object?, see http://momentjs.com/docs/#/durations/
 
@@ -19,10 +49,11 @@ export class GoalTime {
 
     const duration = read[0].trim()
     const distance = +read[1].trim()
-    let name = read.slice(2)
+    let name = ''
+    let readName = read.slice(2)
 
-    if (name.length) {
-      name = name.map(n => n.trim()).join(' ')
+    if (readName.length) {
+      name = readName.map(n => n.trim()).join(' ')
     } else {
       name = null
     }
@@ -43,8 +74,6 @@ export class GoalTime {
       )
     }
 
-    console.log(duration, distance, name)
-
     return new GoalTime(duration, distance, name)
   }
 
@@ -56,7 +85,7 @@ export class GoalTime {
   }
 
   toString(): string {
-    return `${this.duration} ${this.distance}`
+    return [this.duration, this.distance, this.name].join(' ')
   }
 }
 
@@ -67,36 +96,6 @@ export class PracticePace {
 export class PracticeGroup {
   // data for outputs
   constructor(public goalTime: GoalTime, public practicePace: PracticePace) {}
-}
-
-const POOLS = {
-  SCY: 0,
-  SCM: 1,
-  LCM: 2
-}
-
-const TIMES = {
-  [POOLS.SCY]: moment.duration('00:3:33.42').asSeconds(),
-  [POOLS.SCM]: moment.duration('00:3:55.50').asSeconds(),
-  [POOLS.LCM]: moment.duration('00:4:03.84').asSeconds()
-}
-
-const POOL_LENGTH_FACTORS = [POOLS.SCY, POOLS.SCM, POOLS.LCM].map(poolLength => {
-  return [
-    TIMES[poolLength] / TIMES[POOLS.SCY],
-    TIMES[poolLength] / TIMES[POOLS.SCM] ,
-    TIMES[poolLength] / TIMES[POOLS.LCM]
-  ]
-})
-
-function poolLength(fromLength) {
-  let _fromLength = fromLength
-
-  return {
-    to: (toLength) => {
-      return POOL_LENGTH_FACTORS[POOLS[_fromLength]][POOLS[toLength]]
-    }
-  }
 }
 
 export class Rp10 {
@@ -132,7 +131,7 @@ export class Rp10 {
       percentGoalPaceS /
         goalTime.distance *
         this.todaysRepeats *
-        poolLength(this.todayMyTrainingPoolIs).to(this.myGoalTimeIsFor) +
+        poolType(this.todayMyTrainingPoolIs).to(this.myGoalTimeIsFor) +
       this.goalPlusMinus
     )
   }
