@@ -94,40 +94,16 @@ export class Rp10 {
   // form data inputs
   constructor(
     public todaysRepeats: number,
-    public ofReps: number,
+    public repCount: number,
     public goalPlusMinus: number,
     public myGoalTimeIsFor: string,
     public todayMyTrainingPoolIs: string,
-    public ofGoalPaceToTrainToday: number,
+    public percentGoalPaceToTrainToday: number,
     public restPerRepeatS: number,
-    public goalTimes: GoalTime[],
-    public eventGoalTime?: number,
-    public goalEventDistance?: number,
-    public ofGoalPace?: number
+    public goalTimes: GoalTime[]
   ) {}
 
   // TODO getter/setter for percentage units
-
-  // XXX this implementation matches the google sheet
-  getPaceToTrainTodayS(goalTime: GoalTime): number {
-    const split = goalTime.duration.split(':')
-    while (split.length < 3) {
-      split.unshift('00') // to 00:00:00.000 format, https://momentjs.com/docs/#/durations/creating/
-    }
-    const m = moment.duration(split.join(':'))
-    const ofGoalPaceM = m.minutes() * (1 / (this.ofGoalPaceToTrainToday / 100))
-    const ofGoalPaceS = moment
-      .duration(`00:${ofGoalPaceM}:${m.seconds()}.${m.milliseconds()}`)
-      .asSeconds()
-
-    return (
-      ofGoalPaceS /
-        goalTime.distance *
-        this.todaysRepeats *
-        poolLength(this.todayMyTrainingPoolIs).to(this.myGoalTimeIsFor) +
-      this.goalPlusMinus
-    )
-  }
 
   getSheetPracticePace(goalTime: GoalTime): PracticePace {
     const paceToTrainTodayS = this.getPaceToTrainTodayS(goalTime)
@@ -135,23 +111,20 @@ export class Rp10 {
     return new PracticePace(paceToTrainTodayS, +Math.ceil(interval.asSeconds()))
   }
 
-  // XXX % of goal pace is only accounted for if the goal time duration is >=1:00.0
-  // XXX because goal +/- is only factored into the goal duration minutes place
-  // getPaceToTrainToday(goalTime: GoalTime): number {
-  //   // TODO factor in distance conversion value
-  //   const split = goalTime.duration.split(':')
-  //   while (split.length < 3) {
-  //     split.unshift('00') // to 00:00:00.000 format, https://momentjs.com/docs/#/durations/creating/
-  //   }
-  //   const m = moment.duration(split.join(':'))
-  //   const ofGoalPaceS =
-  //     m.asSeconds() * (1 / (this.ofGoalPaceToTrainToday / 100))
-  //   return (
-  //     ofGoalPaceS /
-  //       goalTime.distance *
-  //       this.todaysRepeats *
-  //       poolLength(this.todayMyTrainingPoolIs).to(this.myGoalTimeIsFor) +
-  //     this.goalPlusMinus
-  //   )
-  // }
+  getPaceToTrainTodayS(goalTime: GoalTime): number {
+    const split = goalTime.duration.split(':')
+    while (split.length < 3) {
+      split.unshift('00') // to 00:00:00.000 format, https://momentjs.com/docs/#/durations/creating/
+    }
+    const m = moment.duration(split.join(':'))
+    const percentGoalPaceS =
+      m.asSeconds() * (1 / (this.percentGoalPaceToTrainToday / 100))
+    return (
+      percentGoalPaceS /
+        goalTime.distance *
+        this.todaysRepeats *
+        poolLength(this.todayMyTrainingPoolIs).to(this.myGoalTimeIsFor) +
+      this.goalPlusMinus
+    )
+  }
 }

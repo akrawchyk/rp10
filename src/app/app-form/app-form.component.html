@@ -1,6 +1,6 @@
 <div class="form">
 
-  <form *ngIf="!submitted" [formGroup]="form" novalidate>
+  <form [formGroup]="form" novalidate>
 
     <div class="form-control">
       <label>Today's repeats ___'s</label>
@@ -11,7 +11,7 @@
 
     <md-input-container class="form-control">
       <label># of reps</label>
-      <input mdInput formControlName="ofReps" type="text">
+      <input mdInput formControlName="repCount" type="text">
     </md-input-container>
 
     <md-input-container class="form-control">
@@ -47,17 +47,6 @@
       </md-radio-button>
     </md-radio-group>
 
-    <button md-raised-button (click)="onSubmit()" [disabled]="!form.valid" color="primary" type="button">
-      Submit
-    </button>
-
   </form>
-
-  <app-practice-groups *ngIf="submitted" [rp10]="rp10">
-  </app-practice-groups>
-
-  <button md-raised-button *ngIf="submitted" (click)="reset()" color="accent" type="button">
-    Start over
-  </button>
 
 </div>

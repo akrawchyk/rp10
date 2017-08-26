@@ -33,7 +33,7 @@ pre {
 }
 
 label {
-  display: inline-block;
+  display: block;
   font-weight: bold;
   margin-bottom: 1rem;
 }
@@ -47,10 +47,22 @@ img {
 }
 
 .wrap {
+  display: flex;
   margin: 0 auto;
-  width: 80%;
-  max-width: 600px;
+  justify-content: space-between;
+  padding-top: 2rem;
+  max-width: 640px;
+  width: 85%;
 }
+
+.left-side {
+  padding-right: 1rem;
+  width: 40%;
+}
+
+.right-side {
+}
+
 
 .logo {
   background-color: white;
@@ -72,9 +84,6 @@ img {
 }
 
 .form {
-  display: flex;
-  flex-direction: column;
-  padding-top: 2rem;
   padding-bottom: 2rem;
 }
 
@@ -93,3 +102,7 @@ img {
   .mat-radio-label {
     margin-bottom: 0.5rem;
   }
+
+.practice-group {
+  margin-bottom: 1rem;
+}

@@ -7,7 +7,7 @@ import { Rp10 } from '../rp10'
 @Component({
   selector: 'app-practice-groups',
   template: `
-    <md-card *ngFor="let group of groups; index as i">
+    <md-card class="practice-group" *ngFor="let group of groups; index as i">
       <md-card-header>
         <md-card-title>
           <h3>Group {{i+1}}</h3>
@@ -29,6 +29,7 @@ export class PracticeGroupsComponent implements OnInit, OnChanges {
 
   @Input()
   rp10: Rp10
+
   groups: object[]
 
   constructor() { }
@@ -49,7 +50,7 @@ export class PracticeGroupsComponent implements OnInit, OnChanges {
           goalTime,
           targetDisplay: this._formatTimeDisplay(practicePace.targetS),
           intervalDisplay: this._formatTimeDisplay(practicePace.intervalS),
-          totalSetTime: this._formatTimeDisplay(practicePace.intervalS * this.rp10.ofReps)
+          totalSetTime: this._formatTimeDisplay(practicePace.intervalS * this.rp10.repCount)
         }
       })
     } else {
@@ -64,11 +65,11 @@ export class PracticeGroupsComponent implements OnInit, OnChanges {
     let timeDisplayMs = timeDuration.milliseconds()
     let timeDisplay = timeDisplayS.toString()
 
-    if (timeDisplay.length === 1) {
-      timeDisplay = `0${timeDisplayS}`
-    }
-
     if (timeDisplayM) {
+      if (timeDisplay.length === 1) {
+        timeDisplay = `0${timeDisplayS}`
+      }
+
       timeDisplay = `${timeDisplayM}:${timeDisplay}`
     }
 
