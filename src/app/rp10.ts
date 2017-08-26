@@ -6,12 +6,12 @@ const GOAL_DISTANCES_LIST = [1650, 1500, 800, 500, 400, 200, 100, 50]
 export class GoalTime {
   // TODO convert duration to a moment duration object?, see http://momentjs.com/docs/#/durations/
 
-  constructor(public duration: string, public distance: number) {}
+  constructor(public duration: string, public distance: number, public name?: string) {}
 
   public static fromString(goalTimeString: string): GoalTime {
     const read = goalTimeString.split(' ').filter(present => present)
 
-    if (read.length !== 2) {
+    if (read.length < 2) {
       throw new TypeError(
         `GoalTime.fromString expected input format to be \`<duration> <distance>\`, got \`${goalTimeString}\``
       )
@@ -19,6 +19,13 @@ export class GoalTime {
 
     const duration = read[0].trim()
     const distance = +read[1].trim()
+    let name = read.slice(2)
+
+    if (name.length) {
+      name = name.map(n => n.trim()).join(' ')
+    } else {
+      name = null
+    }
 
     if (!duration || duration.search(GOAL_DURATION_RE) === -1) {
       throw new TypeError(
@@ -36,7 +43,9 @@ export class GoalTime {
       )
     }
 
-    return new GoalTime(duration, distance)
+    console.log(duration, distance, name)
+
+    return new GoalTime(duration, distance, name)
   }
 
   public static fromStringList(

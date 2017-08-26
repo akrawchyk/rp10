@@ -10,7 +10,8 @@ import { Rp10 } from '../rp10'
     <md-card class="practice-group" *ngFor="let group of groups; index as i">
       <md-card-header>
         <md-card-title>
-          <h3>Group {{i+1}}</h3>
+          <h3 *ngIf="group.goalTime.name">{{group.goalTime.name}}</h3>
+          <h3 *ngIf="!group.goalTime.name">Group {{i+1}}</h3>
         </md-card-title>
       </md-card-header>
       <md-card-content>
