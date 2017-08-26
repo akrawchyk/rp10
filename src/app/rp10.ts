@@ -9,7 +9,7 @@ export class GoalTime {
   constructor(public duration: string, public distance: number) {}
 
   public static fromString(goalTimeString: string): GoalTime {
-    const read = goalTimeString.split(' ')
+    const read = goalTimeString.split(' ').filter(present => present)
 
     if (read.length !== 2) {
       throw new TypeError(

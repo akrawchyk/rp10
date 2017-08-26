@@ -1,52 +1,67 @@
-<div class="form">
+<form class="form" [formGroup]="form" novalidate>
 
-  <form [formGroup]="form" novalidate>
+  <div class="form-control form-control--select">
+    <label>Today's repeats ___'s</label>
+    <md-select formControlName="todaysRepeats">
+      <md-option *ngFor="let repeat of repeatChoices" [value]="repeat">{{repeat}}</md-option>
+    </md-select>
+  </div>
 
-    <div class="form-control">
-      <label>Today's repeats ___'s</label>
-      <md-select class="form-control" formControlName="todaysRepeats">
-        <md-option *ngFor="let repeat of repeatChoices" [value]="repeat">{{repeat}}</md-option>
-      </md-select>
-    </div>
-
-    <md-input-container class="form-control">
-      <label># of reps</label>
+  <div class="form-control">
+    <label># of reps</label>
+    <md-input-container>
       <input mdInput formControlName="repCount" type="text">
     </md-input-container>
+  </div>
 
-    <md-input-container class="form-control">
-      <label># of seconds rest per repeat</label>
+  <div class="form-control">
+    <label># of seconds rest per repeat</label>
+    <md-input-container>
       <input mdInput type="text" formControlName="restPerRepeatS">
     </md-input-container>
+  </div>
 
-    <div class="form-control">
-      <app-goal-times name="goalTimes" formControlName="goalTimes"></app-goal-times>
+  <div class="form-control form-control--textarea">
+    <label>Up to 10 goal times</label>
+    <app-goal-times formControlName="goalTimes"></app-goal-times>
 
-      <!-- FIXME display this in the app-goal-times component's md-error -->
-      <p class="message message--error" *ngIf="form.controls.goalTimes.hasError('formatting')">
-        {{form.controls.goalTimes.errors.formatting.message}}
-      </p>
-    </div>
+    <!-- FIXME display this in the app-goal-times component's md-error -->
+    <p class="message message--error" *ngIf="form.controls.goalTimes.hasError('formatting')">
+      {{form.controls.goalTimes.errors.formatting.message}}
+    </p>
+  </div>
 
-    <md-input-container class="form-control">
-      <label>Goal +/-</label>
+  <div class="form-control">
+    <label>Percent of goal pace to train today</label>
+    <md-input-container>
+      <input mdInput type="number" formControlName="percentGoalPaceToTrainToday">
+      <span mdSuffix>%</span>
+    </md-input-container>
+  </div>
+
+  <div class="form-control">
+    <label>Goal +/- seconds</label>
+    <md-input-container>
       <input mdInput type="number" formControlName="goalPlusMinus">
     </md-input-container>
+  </div>
 
-    <md-radio-group class="form-control radio-group" formControlName="myGoalTimeIsFor">
-      <label class="radio-group-label">My goal time is for:</label>
+  <div class="form-control form-control--radio-group">
+    <label>My goal time is for:</label>
+    <md-radio-group formControlName="myGoalTimeIsFor">
       <md-radio-button *ngFor="let poolLength of poolLengthChoices" [value]="poolLength">
         {{poolLength}}
       </md-radio-button>
     </md-radio-group>
+  </div>
 
-    <md-radio-group class="form-control radio-group" formControlName="todayMyTrainingPoolIs">
-      <label class="radio-group-label">Today my training pool is:</label>
+  <div class="form-control form-control--radio-group">
+    <label>Today my training pool is:</label>
+    <md-radio-group formControlName="todayMyTrainingPoolIs">
       <md-radio-button *ngFor="let poolLength of poolLengthChoices" [value]="poolLength">
         {{poolLength}}
       </md-radio-button>
     </md-radio-group>
+  </div>
 
-  </form>
-
-</div>
+</form>

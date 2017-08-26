@@ -36,10 +36,10 @@ export class AppFormComponent implements OnInit {
     this.form = fb.group({
       todaysRepeats: [50, Validators.required],
       repCount: [20, Validators.required],
-      goalPlusMinus: [-5, Validators.required],
+      goalPlusMinus: [0, Validators.required],
       myGoalTimeIsFor: ['SCY', Validators.required],
       todayMyTrainingPoolIs: ['SCM', Validators.required],
-      percentGoalPaceToTrainToday: [50, Validators.required],
+      percentGoalPaceToTrainToday: [100, Validators.required],
       restPerRepeatS: [25, Validators.required],
       // use text representation for textarea input
       goalTimes: [

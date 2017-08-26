@@ -32,8 +32,8 @@ function createGoalTimeStringsValidator(): ValidatorFn {
   selector: 'app-goal-times',
   template: `
     <md-input-container>
-      <label>Up to 10 goal times (with distance, e.g <kbd>2:01.49 200</kbd>)</label>
       <textarea mdInput [(ngModel)]="value" rows=10></textarea>
+      <md-hint>example: 1:42.0 200 John G</md-hint>
     </md-input-container>
   `,
   providers: [
@@ -51,7 +51,8 @@ function createGoalTimeStringsValidator(): ValidatorFn {
   styleUrls: ['./goal-times.component.scss']
 })
 export class GoalTimesComponent implements OnInit, ControlValueAccessor {
-  @Input('value') _value: string = ''
+  @Input('value')
+  _value: string = ''
 
   validateFn: any = () => {}
   propagateChange: any = () => {}

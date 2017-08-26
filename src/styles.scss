@@ -28,14 +28,14 @@ $rp10-app-theme: mat-light-theme($rp10-app-primary, $rp10-app-accent, $rp10-app-
 // that you are using.
 @include angular-material-theme($rp10-app-theme);
 
-pre {
-  overflow-x: scroll;
+html,
+body {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
 label {
   display: block;
   font-weight: bold;
-  margin-bottom: 1rem;
 }
 
 .mat-radio-label {
@@ -88,19 +88,38 @@ img {
 }
 
   .form-control {
-    margin-bottom: 1rem;
-    display: flex;
-    flex-direction: column;
+    margin-bottom: 1.5rem;
   }
 
-.radio-group {
-  display: flex;
-  flex-direction: column;
-}
+  .form-control--select,
+  .form-control--textarea,
+  .form-control--radio-group {
+    // consistent padding with .mat-input-wrapper
+    padding-bottom: 1.296875em;
+  }
 
-  .radio-group-label,
-  .mat-radio-label {
-    margin-bottom: 0.5rem;
+  .form-control--select,
+  .form-control--radio-group {
+    .mat-select,
+    .mat-radio-group {
+      // consistent border with .mat-input-infix
+      border-top: 0.84375em solid transparent;
+    }
+  }
+
+  .form-control--radio-group {
+    .mat-radio-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mat-radio-button {
+      padding: 7px 0;
+
+      &:last-child {
+        padding-bottom: 0;
+      }
+    }
   }
 
 .practice-group {
