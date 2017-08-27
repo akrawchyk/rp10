@@ -1,6 +1,6 @@
 import * as moment from 'moment'
 
-import { Component, OnChanges, OnInit, Input } from '@angular/core';
+import { Component, OnChanges, OnInit, Input } from '@angular/core'
 
 import { Rp10, formatTimeDisplay } from '../rp10'
 
@@ -28,13 +28,11 @@ import { Rp10, formatTimeDisplay } from '../rp10'
   styleUrls: ['./practice-groups.component.scss']
 })
 export class PracticeGroupsComponent implements OnInit, OnChanges {
-
-  @Input()
-  rp10: Rp10
+  @Input() rp10: Rp10
 
   groups: object[]
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit() {
     this._setGroups()
@@ -47,18 +45,21 @@ export class PracticeGroupsComponent implements OnInit, OnChanges {
   _setGroups() {
     if (this.rp10) {
       this.groups = this.rp10.goalTimes.map(goalTime => {
-        const practicePace = this.rp10.getPracticePace(goalTime)
+        const practicePace = this.rp10.getPracticePaceForGoalTime(goalTime)
         return {
           goalTime,
-          goalPoolType: this.rp10.myGoalTimeIsFor[this.rp10.myGoalTimeIsFor.length - 1].toLowerCase(),
+          goalPoolType: this.rp10.myGoalTimeIsFor[
+            this.rp10.myGoalTimeIsFor.length - 1
+          ].toLowerCase(),
           targetDisplay: formatTimeDisplay(practicePace.targetS),
           intervalDisplay: formatTimeDisplay(practicePace.intervalS),
-          totalSetTime: formatTimeDisplay(practicePace.intervalS * this.rp10.repCount)
+          totalSetTime: formatTimeDisplay(
+            practicePace.intervalS * this.rp10.repCount
+          )
         }
       })
     } else {
       this.groups = []
     }
   }
-
 }

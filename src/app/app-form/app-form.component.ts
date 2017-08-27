@@ -11,28 +11,27 @@ import { Rp10, GoalTime } from '../rp10'
 export class AppFormComponent implements OnInit {
   rp10: Rp10
 
-  @Output('update')
-  change: EventEmitter<Rp10> = new EventEmitter<Rp10>()
+  @Output('update') change: EventEmitter<Rp10> = new EventEmitter<Rp10>()
 
   repeatChoices = [25, 50, 75, 100, 125, 150, 175, 200, 225, 250]
   poolLengthChoices = ['SCY', 'SCM', 'LCM']
 
-  goalTimes: GoalTime[] = [
-    new GoalTime('1:42.0', 200, 'John G'),
-    new GoalTime('53.7', 100),
-    new GoalTime('23.41', 50),
-    new GoalTime('5:00', 500),
-    new GoalTime('4:08.02', 500),
-    new GoalTime('26', 50),
-    new GoalTime('33', 50),
-    new GoalTime('32', 50),
-    new GoalTime('32', 50),
-    new GoalTime('40', 50)
-  ]
-
   form: FormGroup
 
   constructor(private fb: FormBuilder) {
+    const initialGoalTimes = [
+      new GoalTime('1:42.0', 200, 'John G'),
+      new GoalTime('53.7', 100),
+      new GoalTime('23.41', 50),
+      new GoalTime('5:00', 500),
+      new GoalTime('4:08.02', 500),
+      new GoalTime('26', 50),
+      new GoalTime('33', 50),
+      new GoalTime('32', 50),
+      new GoalTime('32', 50),
+      new GoalTime('40', 50)
+    ]
+
     this.form = fb.group({
       todaysRepeats: [50, Validators.required],
       repCount: [20, Validators.required],
@@ -43,7 +42,7 @@ export class AppFormComponent implements OnInit {
       restPerRepeatS: [25, Validators.required],
       // use text representation for textarea input
       goalTimes: [
-        this.goalTimes.map(goalTime => goalTime.toString()).join('\n'),
+        initialGoalTimes.map(goalTime => goalTime.toString()).join('\n'),
         Validators.required
       ]
     })
@@ -51,11 +50,11 @@ export class AppFormComponent implements OnInit {
     this.form.valueChanges.subscribe(form => this.update())
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.update()
   }
 
-  update() {
+  update(): void {
     if (!this.form.valid) {
       this.rp10 = null
     } else {
@@ -78,7 +77,7 @@ export class AppFormComponent implements OnInit {
         todayMyTrainingPoolIs,
         percentGoalPaceToTrainToday,
         restPerRepeatS,
-        GoalTime.fromStringList(goalTimes.trim())
+        goalTimes.trim().split('\n').map(GoalTime.fromString)
       )
     }
 

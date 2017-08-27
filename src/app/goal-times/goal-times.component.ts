@@ -51,8 +51,7 @@ function createGoalTimeStringsValidator(): ValidatorFn {
   styleUrls: ['./goal-times.component.scss']
 })
 export class GoalTimesComponent implements OnInit, ControlValueAccessor {
-  @Input('value')
-  _value: string = ''
+  @Input('value') _value: string = ''
 
   validateFn: any = () => {}
   propagateChange: any = () => {}

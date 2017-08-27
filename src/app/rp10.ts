@@ -18,7 +18,7 @@ const TIMES = {
 const POOL_LENGTH_FACTORS = [POOLS.SCY, POOLS.SCM, POOLS.LCM].map(poolType => {
   return [
     TIMES[poolType] / TIMES[POOLS.SCY],
-    TIMES[poolType] / TIMES[POOLS.SCM] ,
+    TIMES[poolType] / TIMES[POOLS.SCM],
     TIMES[poolType] / TIMES[POOLS.LCM]
   ]
 })
@@ -27,7 +27,7 @@ function poolType(fromLength) {
   const _fromLength = fromLength
 
   return {
-    to: (toLength) => {
+    to: toLength => {
       return POOL_LENGTH_FACTORS[POOLS[_fromLength]][POOLS[toLength]]
     }
   }
@@ -38,26 +38,36 @@ export function formatTimeDisplay(timeS: number): string {
   let timeDisplayS = timeDuration.seconds()
   let timeDisplayM = timeDuration.minutes()
   let timeDisplayMs = timeDuration.milliseconds()
-  let timeDisplay = timeDisplayS.toString()
+  let timeDisplay = `${timeDisplayS}`
 
-  if (timeDisplayM) {
-    if (timeDisplay.length === 1) {
-      timeDisplay = `0${timeDisplayS}`
-    }
-
-    timeDisplay = `${timeDisplayM}:${timeDisplay}`
+  // add leading 0 to seconds
+  if (timeDisplay.length === 1) {
+    timeDisplay = `0${timeDisplayS}`
   }
 
+  // add leading colon to seconds
+  timeDisplay = `:${timeDisplay}`
+
+  // add minutes
+  if (timeDisplayM) {
+    timeDisplay = `${timeDisplayM}${timeDisplay}`
+  }
+
+  // round up to nearest 100th and add 10th's place
+  const tenths = (Math.ceil(timeDuration.milliseconds() / 100) * 100).toString()[0]
   if (timeDisplayMs) {
-    // round up to nearest 100th and take first digit
-    timeDisplay = `${timeDisplay}.${(Math.ceil(timeDuration.milliseconds()/100)*100).toString()[0]}`
+    timeDisplay = `${timeDisplay}.${tenths}`
   }
 
   return timeDisplay
 }
 
 export class GoalTime {
-  constructor(public duration: string, public distance: number, public name?: string) {}
+  constructor(
+    public duration: string,
+    public distance: number,
+    public name?: string
+  ) {}
 
   public static fromString(goalTimeString: string): GoalTime {
     const read = goalTimeString.split(' ').filter(present => present)
@@ -96,13 +106,6 @@ export class GoalTime {
     }
 
     return new GoalTime(duration, distance, name)
-  }
-
-  public static fromStringList(
-    goalTimeStringList: string,
-    separator: string = '\n'
-  ): GoalTime[] {
-    return goalTimeStringList.split(separator).map(GoalTime.fromString)
   }
 
   toString(): string {
@@ -153,9 +156,12 @@ export class Rp10 {
 
   // TODO getter/setter for percentage units
 
-  getPracticePace(goalTime: GoalTime): PracticePace {
+  getPracticePaceForGoalTime(goalTime: GoalTime): PracticePace {
     const paceToTrainTodayS = this.getPaceToTrainTodayS(goalTime)
-    const interval = moment.duration(paceToTrainTodayS + this.restPerRepeatS, 'seconds')
+    const interval = moment.duration(
+      paceToTrainTodayS + this.restPerRepeatS,
+      'seconds'
+    )
     return new PracticePace(paceToTrainTodayS, +Math.ceil(interval.asSeconds()))
   }
 
@@ -178,23 +184,22 @@ export class Rp10 {
 
   toSecondsProFormat(): SecondsProFormat[] {
     return this.goalTimes.map((goalTime, idx) => {
-      const practicePace = this.getPracticePace(goalTime)
+      const practicePace = this.getPracticePaceForGoalTime(goalTime)
       const name = goalTime.name || `Group ${idx + 1}`
       const intervals = []
-      while (intervals.length !== this.repCount) { intervals.push(this.repCount) }
+      while (intervals.length !== this.repCount) {
+        intervals.push(this.repCount)
+      }
       // XXX why doesnt this work? always get array of undefined
       // intervals.length = this.repCount
       // intervals.map...
 
-
       return new SecondsProFormat(
         name,
         intervals.map((repCount, idxx) => {
-          const iname = `rep ${idxx + 1} -> ${repCount}x${this.todaysRepeats} target: ${formatTimeDisplay(practicePace.targetS)}`
-          return new SecondsProIntervalFormat(
-            iname,
-            practicePace.intervalS
-          )
+          const iname = `rep ${idxx + 1} -> ${repCount}x${this
+            .todaysRepeats} target: ${formatTimeDisplay(practicePace.targetS)}`
+          return new SecondsProIntervalFormat(iname, practicePace.intervalS)
         })
       )
     })
