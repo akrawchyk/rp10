@@ -1,0 +1,38 @@
+.form {
+  padding-bottom: 2rem;
+}
+
+  .form-control {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-control--select,
+  .form-control--textarea,
+  .form-control--radio-group {
+    // consistent padding with .mat-input-wrapper
+    padding-bottom: 1.296875em;
+  }
+
+  .form-control--select,
+  .form-control--radio-group {
+    .mat-select,
+    .mat-radio-group {
+      // consistent border with .mat-input-infix
+      border-top: 0.84375em solid transparent;
+    }
+  }
+
+  .form-control--radio-group {
+    .mat-radio-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mat-radio-button {
+      padding: 7px 0;
+
+      &:last-child {
+        padding-bottom: 0;
+      }
+    }
+  }

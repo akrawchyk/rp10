@@ -2,7 +2,7 @@ import * as moment from 'moment'
 
 import { Component, OnChanges, OnInit, Input } from '@angular/core';
 
-import { Rp10 } from '../rp10'
+import { Rp10, formatTimeDisplay } from '../rp10'
 
 @Component({
   selector: 'app-practice-groups',
@@ -21,6 +21,7 @@ import { Rp10 } from '../rp10'
           <md-list-item>Goal event: {{group.goalTime.distance}}{{group.goalPoolType}} @ {{group.goalTime.duration}}</md-list-item>
           <md-list-item>Total set time: {{group.totalSetTime}}</md-list-item>
         </md-list>
+        <app-seconds-pro-exporter *ngIf="rp10" [rp10]="rp10" [goalTimeIndex]="i"></app-seconds-pro-exporter>
       </md-card-content>
     </md-card>
   `,
@@ -46,41 +47,18 @@ export class PracticeGroupsComponent implements OnInit, OnChanges {
   _setGroups() {
     if (this.rp10) {
       this.groups = this.rp10.goalTimes.map(goalTime => {
-        const practicePace = this.rp10.getSheetPracticePace(goalTime)
+        const practicePace = this.rp10.getPracticePace(goalTime)
         return {
           goalTime,
           goalPoolType: this.rp10.myGoalTimeIsFor[this.rp10.myGoalTimeIsFor.length - 1].toLowerCase(),
-          targetDisplay: this._formatTimeDisplay(practicePace.targetS),
-          intervalDisplay: this._formatTimeDisplay(practicePace.intervalS),
-          totalSetTime: this._formatTimeDisplay(practicePace.intervalS * this.rp10.repCount)
+          targetDisplay: formatTimeDisplay(practicePace.targetS),
+          intervalDisplay: formatTimeDisplay(practicePace.intervalS),
+          totalSetTime: formatTimeDisplay(practicePace.intervalS * this.rp10.repCount)
         }
       })
     } else {
       this.groups = []
     }
-  }
-
-  _formatTimeDisplay(timeS: number): string {
-    const timeDuration = moment.duration(timeS, 'seconds')
-    let timeDisplayS = timeDuration.seconds()
-    let timeDisplayM = timeDuration.minutes()
-    let timeDisplayMs = timeDuration.milliseconds()
-    let timeDisplay = timeDisplayS.toString()
-
-    if (timeDisplayM) {
-      if (timeDisplay.length === 1) {
-        timeDisplay = `0${timeDisplayS}`
-      }
-
-      timeDisplay = `${timeDisplayM}:${timeDisplay}`
-    }
-
-    if (timeDisplayMs) {
-      // round up to nearest 100th and take first digit
-      timeDisplay = `${timeDisplay}.${(Math.ceil(timeDuration.milliseconds()/100)*100).toString()[0]}`
-    }
-
-    return timeDisplay
   }
 
 }

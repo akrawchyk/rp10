@@ -33,9 +33,30 @@ function poolType(fromLength) {
   }
 }
 
-export class GoalTime {
-  // TODO convert duration to a moment duration object?, see http://momentjs.com/docs/#/durations/
+export function formatTimeDisplay(timeS: number): string {
+  const timeDuration = moment.duration(timeS, 'seconds')
+  let timeDisplayS = timeDuration.seconds()
+  let timeDisplayM = timeDuration.minutes()
+  let timeDisplayMs = timeDuration.milliseconds()
+  let timeDisplay = timeDisplayS.toString()
 
+  if (timeDisplayM) {
+    if (timeDisplay.length === 1) {
+      timeDisplay = `0${timeDisplayS}`
+    }
+
+    timeDisplay = `${timeDisplayM}:${timeDisplay}`
+  }
+
+  if (timeDisplayMs) {
+    // round up to nearest 100th and take first digit
+    timeDisplay = `${timeDisplay}.${(Math.ceil(timeDuration.milliseconds()/100)*100).toString()[0]}`
+  }
+
+  return timeDisplay
+}
+
+export class GoalTime {
   constructor(public duration: string, public distance: number, public name?: string) {}
 
   public static fromString(goalTimeString: string): GoalTime {
@@ -98,6 +119,25 @@ export class PracticeGroup {
   constructor(public goalTime: GoalTime, public practicePace: PracticePace) {}
 }
 
+class SecondsProIntervalFormat {
+  constructor(
+    public name: string,
+    public duration: number,
+    public color: number = 3
+  ) {}
+}
+
+class SecondsProFormat {
+  constructor(
+    public name: string,
+    public intervals: SecondsProIntervalFormat[],
+    public numberOfSets: number = 1,
+    public type: number = 0,
+    public soundScheme: number = 8,
+    public via: string = 'web'
+  ) {}
+}
+
 export class Rp10 {
   // form data inputs
   constructor(
@@ -113,7 +153,7 @@ export class Rp10 {
 
   // TODO getter/setter for percentage units
 
-  getSheetPracticePace(goalTime: GoalTime): PracticePace {
+  getPracticePace(goalTime: GoalTime): PracticePace {
     const paceToTrainTodayS = this.getPaceToTrainTodayS(goalTime)
     const interval = moment.duration(paceToTrainTodayS + this.restPerRepeatS, 'seconds')
     return new PracticePace(paceToTrainTodayS, +Math.ceil(interval.asSeconds()))
@@ -134,5 +174,29 @@ export class Rp10 {
         poolType(this.todayMyTrainingPoolIs).to(this.myGoalTimeIsFor) +
       this.goalPlusMinus
     )
+  }
+
+  toSecondsProFormat(): SecondsProFormat[] {
+    return this.goalTimes.map((goalTime, idx) => {
+      const practicePace = this.getPracticePace(goalTime)
+      const name = goalTime.name || `Group ${idx + 1}`
+      const intervals = []
+      while (intervals.length !== this.repCount) { intervals.push(this.repCount) }
+      // XXX why doesnt this work? always get array of undefined
+      // intervals.length = this.repCount
+      // intervals.map...
+
+
+      return new SecondsProFormat(
+        name,
+        intervals.map((repCount, idxx) => {
+          const iname = `rep ${idxx + 1} -> ${repCount}x${this.todaysRepeats} target: ${formatTimeDisplay(practicePace.targetS)}`
+          return new SecondsProIntervalFormat(
+            iname,
+            practicePace.intervalS
+          )
+        })
+      )
+    })
   }
 }
