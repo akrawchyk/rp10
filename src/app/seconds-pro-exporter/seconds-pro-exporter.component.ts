@@ -7,7 +7,7 @@ import { Rp10 } from '../rp10'
   selector: 'app-seconds-pro-exporter',
   template: `
     <button md-raised-button (click)="onClick()" color="accent" type="button">
-      <span class="material-icons">get_app</span> Export to <code>.seconds</code>
+      <span class="material-icons">get_app</span> Export to .seconds
     </button>
     <a >
   `,
@@ -27,9 +27,10 @@ export class SecondsProExporterComponent implements OnInit {
   onClick() {
     // export rp10 -> .seconds
     const secondsFormat = this.rp10.toSecondsProFormat()[this.goalTimeIndex]
+    const name = secondsFormat.name.split(' ').join('_')
     const blob = new Blob([JSON.stringify(secondsFormat, null, 2)], {
       type: 'application/json'
     })
-    FileSaver.saveAs(blob, `${secondsFormat.name}_RP10_export.seconds`)
+    FileSaver.saveAs(blob, `${name}_RP10_export.seconds`)
   }
 }
