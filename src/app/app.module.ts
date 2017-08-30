@@ -17,7 +17,8 @@ import { AppComponent } from './app.component'
 import { AppFormComponent } from './app-form/app-form.component'
 import { GoalTimesComponent } from './goal-times/goal-times.component'
 import { PracticeGroupsComponent } from './practice-groups/practice-groups.component'
-import { SecondsProExporterComponent } from './seconds-pro-exporter/seconds-pro-exporter.component'
+import { SecondsProExporterComponent } from './seconds-pro-exporter/seconds-pro-exporter.component';
+import { TimePipe } from './time.pipe';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { SecondsProExporterComponent } from './seconds-pro-exporter/seconds-pro-
     AppFormComponent,
     GoalTimesComponent,
     PracticeGroupsComponent,
-    SecondsProExporterComponent
+    SecondsProExporterComponent,
+    TimePipe
   ],
   imports: [
     BrowserModule,
