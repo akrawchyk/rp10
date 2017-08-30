@@ -21,7 +21,6 @@ import { Rp10, formatTimeDisplay } from '../rp10'
           <md-list-item>Goal event: {{group.goalTime.distance}}{{group.goalPoolType}} @ {{group.goalTime.duration}}</md-list-item>
           <md-list-item>Total set time: {{group.totalSetTime}}</md-list-item>
         </md-list>
-        <app-seconds-pro-exporter *ngIf="rp10" [rp10]="rp10" [goalTimeIndex]="i"></app-seconds-pro-exporter>
       </md-card-content>
     </md-card>
   `,

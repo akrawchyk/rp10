@@ -4,5 +4,6 @@ interface NodeModule {
   id: string
 }
 
-declare module 'moment'
 declare module 'file-saver'
+declare module 'jszip'
+declare module 'moment'
