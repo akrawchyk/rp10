@@ -74,6 +74,12 @@ export class AppFormComponent implements OnInit {
         sameIntervalS
       } = this.form.value
 
+      if (this.rp10 && this.rp10.sameIntervalS === sameIntervalS) {
+        // something else changed besides same interval
+        sameIntervalS = null
+        this.form.patchValue({ sameIntervalS })
+      }
+
       this.rp10 = new Rp10(
         todaysRepeats,
         repCount,
@@ -86,21 +92,24 @@ export class AppFormComponent implements OnInit {
         +sameIntervalS
       )
 
-      this.intervalSChoices = (() => {
-        // find the slowest pace
-        const slowestIntervalS = this.rp10.goalTimes
-          .map(goalTime => this.rp10.getPracticePaceForGoalTime(goalTime))
-          .reduce((slowestS, pace) => {
-            return pace.intervalS > slowestS ? pace.intervalS: slowestS
-          }, 0)
+      if (!this.rp10.sameIntervalS) {
+        // need to present new interval choices
+        this.intervalSChoices = (() => {
+          // find the slowest pace
+          const slowestIntervalS = this.rp10.goalTimes
+            .map(goalTime => this.rp10.getPracticePaceForGoalTime(goalTime))
+            .reduce((slowestS, pace) => {
+              return pace.intervalS > slowestS ? pace.intervalS: slowestS
+            }, 0)
 
-        // generate n intervals 5 seconds apart
-        const out = []
-        for (let i = 0; i < 25; i++) {
-          out.push(slowestIntervalS + (i * 5))
-        }
-        return out
-      })()
+          // generate n intervals 5 seconds apart
+          const out = []
+          for (let i = 0; i < 25; i++) {
+            out.push(slowestIntervalS + (i * 5))
+          }
+          return out
+        })()
+      }
     }
 
     this.change.emit(this.rp10)
