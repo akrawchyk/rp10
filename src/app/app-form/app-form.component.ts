@@ -13,8 +13,9 @@ export class AppFormComponent implements OnInit {
 
   @Output('update') change: EventEmitter<Rp10> = new EventEmitter<Rp10>()
 
-  repeatChoices = [25, 50, 75, 100, 125, 150, 175, 200, 225, 250]
-  poolLengthChoices = ['SCY', 'SCM', 'LCM']
+  repeatChoices: number[] = [25, 50, 75, 100, 125, 150, 175, 200, 225, 250]
+  poolLengthChoices: string[] = ['SCY', 'SCM', 'LCM']
+  intervalSChoices: number[] = []
 
   form: FormGroup
 
@@ -40,6 +41,7 @@ export class AppFormComponent implements OnInit {
       todayMyTrainingPoolIs: ['SCM', Validators.required],
       percentGoalPaceToTrainToday: [100, Validators.required],
       restPerRepeatS: [25, Validators.required],
+      sameIntervalS: null,
       // use text representation for textarea input
       goalTimes: [
         initialGoalTimes.map(goalTime => goalTime.toString()).join('\n'),
@@ -55,8 +57,10 @@ export class AppFormComponent implements OnInit {
   }
 
   update(): void {
+    // update interval choices
     if (!this.form.valid) {
       this.rp10 = null
+      this.intervalSChoices = []
     } else {
       let {
         todaysRepeats,
@@ -66,7 +70,8 @@ export class AppFormComponent implements OnInit {
         todayMyTrainingPoolIs,
         percentGoalPaceToTrainToday,
         restPerRepeatS,
-        goalTimes
+        goalTimes,
+        sameIntervalS
       } = this.form.value
 
       this.rp10 = new Rp10(
@@ -77,8 +82,25 @@ export class AppFormComponent implements OnInit {
         todayMyTrainingPoolIs,
         percentGoalPaceToTrainToday,
         restPerRepeatS,
-        goalTimes.trim().split('\n').map(GoalTime.fromString)
+        goalTimes.trim().split('\n').map(GoalTime.fromString),
+        +sameIntervalS
       )
+
+      this.intervalSChoices = (() => {
+        // find the slowest pace
+        const slowestIntervalS = this.rp10.goalTimes
+          .map(goalTime => this.rp10.getPracticePaceForGoalTime(goalTime))
+          .reduce((slowestS, pace) => {
+            return pace.intervalS > slowestS ? pace.intervalS: slowestS
+          }, 0)
+
+        // generate n intervals 5 seconds apart
+        const out = []
+        for (let i = 0; i < 25; i++) {
+          out.push(slowestIntervalS + (i * 5))
+        }
+        return out
+      })()
     }
 
     this.change.emit(this.rp10)

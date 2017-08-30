@@ -40,7 +40,7 @@ export class SecondsProExporterComponent implements OnInit {
     zip.generateAsync({ type: 'blob' })
       .then(blob => {
         FileSaver.saveAs(blob, 'RP10_seconds_export.zip')
-      }, err =>{
+      }, err => {
         this.errorMessage = err.message
       })
       .then(err => {

@@ -151,21 +151,29 @@ export class Rp10 {
     public todayMyTrainingPoolIs: string,
     public percentGoalPaceToTrainToday: number,
     public restPerRepeatS: number,
-    public goalTimes: GoalTime[]
+    public goalTimes: GoalTime[],
+    public sameIntervalS?: number
   ) {}
 
   // TODO getter/setter for percentage units
 
   getPracticePaceForGoalTime(goalTime: GoalTime): PracticePace {
-    const paceToTrainTodayS = this.getPaceToTrainTodayS(goalTime)
-    const interval = moment.duration(
-      paceToTrainTodayS + this.restPerRepeatS,
-      'seconds'
-    )
-    return new PracticePace(paceToTrainTodayS, +Math.ceil(interval.asSeconds()))
+    const targetToTrainTodayS = this.getTargetToTrainTodayS(goalTime)
+    let intervalToTrainTodayS
+
+    if (this.sameIntervalS) {
+      intervalToTrainTodayS = this.sameIntervalS
+    } else {
+      intervalToTrainTodayS = moment.duration(
+        targetToTrainTodayS + this.restPerRepeatS,
+        'seconds'
+      ).asSeconds()
+    }
+
+    return new PracticePace(targetToTrainTodayS, Math.ceil(intervalToTrainTodayS))
   }
 
-  getPaceToTrainTodayS(goalTime: GoalTime): number {
+  getTargetToTrainTodayS(goalTime: GoalTime): number {
     const split = goalTime.duration.split(':')
     while (split.length < 3) {
       split.unshift('00') // to 00:00:00.000 format, https://momentjs.com/docs/#/durations/creating/

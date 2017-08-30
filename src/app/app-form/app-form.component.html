@@ -64,6 +64,16 @@
     </md-radio-group>
   </div>
 
+  <div *ngIf="rp10" class="form-control">
+    <label>Keep everyone on the same interval:</label>
+    <md-select formControlName="sameIntervalS">
+      <md-option [value]="">Unselect interval</md-option>
+      <md-option *ngFor="let intervalS of intervalSChoices" [value]="intervalS">
+        {{intervalS}}
+      </md-option>
+    </md-select>
+  </div>
+
 </form>
 
 <app-seconds-pro-exporter *ngIf="rp10" [rp10]="rp10"></app-seconds-pro-exporter>
