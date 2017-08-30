@@ -1,7 +1,7 @@
 import * as moment from 'moment'
 
 const GOAL_DURATION_RE = /^(\d{0,2}:)?\d{2}(\.\d{0,2})?$/
-const GOAL_DISTANCES_LIST = [1650, 1500, 800, 500, 400, 200, 100, 50]
+const GOAL_DISTANCES_LIST = [25000, 10000, 1650, 1500, 1000, 800, 500, 400, 300, 200, 100, 50, 25]
 
 const POOLS = {
   SCY: 0,
