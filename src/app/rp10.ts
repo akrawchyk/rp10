@@ -67,6 +67,11 @@ export function formatTimeDisplay(timeS: number): string {
   timeDisplay = `:${timeDisplay}`
 
   if (timeDisplayM) {
+    // add leading 0 to minutes for hours
+    if (timeDisplayH && timeDisplayM.length === 1) {
+      timeDisplayM = `0${timeDisplayM}`
+    }
+    
     // add minutes
     timeDisplay = `${timeDisplayM}${timeDisplay}`
   } else if (timeDisplayH) {
