@@ -1,6 +1,7 @@
 import * as moment from 'moment'
 
-const GOAL_DURATION_RE = /^(\d{0,2}:)?\d{2}(\.\d{0,2})?$/
+// hh:mm:ss.msms, see http://refiddle.com/nl56
+const GOAL_DURATION_RE = /^(\d{0,2}:)?([0-5]?\d?:)?[0-5]?\d?(\.\d{0,2})?$/
 const GOAL_DISTANCES_LIST = [
   25000,
   10000,
@@ -17,6 +18,7 @@ const GOAL_DISTANCES_LIST = [
   25,
 ]
 
+// TODO use typescript enums for these
 const POOLS = {
   SCY: 0,
   SCM: 1,
@@ -24,9 +26,10 @@ const POOLS = {
 }
 
 const TIMES = {
-  [POOLS.SCY]: moment.duration('00:3:33.42').asSeconds(),
-  [POOLS.SCM]: moment.duration('00:3:55.50').asSeconds(),
-  [POOLS.LCM]: moment.duration('00:4:03.84').asSeconds(),
+  // TODO expose these base times in admin access
+  [POOLS.SCY]: moment.duration('00:03:33.42').asSeconds(),
+  [POOLS.SCM]: moment.duration('00:03:55.50').asSeconds(),
+  [POOLS.LCM]: moment.duration('00:04:03.84').asSeconds(),
 }
 
 const POOL_LENGTH_FACTORS = [POOLS.SCY, POOLS.SCM, POOLS.LCM].map(poolType => {
@@ -49,8 +52,9 @@ function poolType(fromLength) {
 
 export function formatTimeDisplay(timeS: number): string {
   const timeDuration = moment.duration(timeS, 'seconds')
-  let timeDisplayS = timeDuration.seconds()
+  let timeDisplayH = timeDuration.hours()
   let timeDisplayM = timeDuration.minutes()
+  let timeDisplayS = timeDuration.seconds()
   let timeDisplayMs = timeDuration.milliseconds()
   let timeDisplay = `${timeDisplayS}`
 
@@ -65,6 +69,11 @@ export function formatTimeDisplay(timeS: number): string {
   // add minutes
   if (timeDisplayM) {
     timeDisplay = `${timeDisplayM}${timeDisplay}`
+  }
+
+  // add hours
+  if (timeDisplayH) {
+    timeDisplay = `${timeDisplayH}:${timeDisplay}`
   }
 
   // round up to nearest 100th and add 10th's place
@@ -93,6 +102,7 @@ export class GoalTime {
       )
     }
 
+    // format: duration distance name...
     const duration = read[0].trim()
     const distance = +read[1].trim()
     let name = ''
@@ -106,7 +116,7 @@ export class GoalTime {
 
     if (!duration || duration.search(GOAL_DURATION_RE) === -1) {
       throw new TypeError(
-        `GoalTime.fromString expected duration format to be \`mm:ss.msms\`, got \`${read[0]}\``
+        `GoalTime.fromString expected duration format to be \`hh:mm:ss.msms\`, got \`${read[0]}\``
       )
     }
 

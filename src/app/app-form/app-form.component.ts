@@ -26,11 +26,10 @@ export class AppFormComponent implements OnInit {
       new GoalTime('23.41', 50),
       new GoalTime('5:00', 500),
       new GoalTime('4:08.02', 500),
+      new GoalTime('4:19:33.09', 25000),
       new GoalTime('26', 50),
       new GoalTime('33', 50),
-      new GoalTime('32', 50),
-      new GoalTime('32', 50),
-      new GoalTime('40', 50),
+      new GoalTime('36', 50),
     ]
 
     this.form = fb.group({
@@ -108,7 +107,7 @@ export class AppFormComponent implements OnInit {
           // generate n intervals 5 seconds apart
           const intervals = []
           for (let i = 0; i < 25; i++) {
-            out.push(slowestIntervalS + i * 5)
+            intervals.push(slowestIntervalS + i * 5)
           }
           return intervals
         })()
