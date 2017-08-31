@@ -10,15 +10,15 @@ import {
   MdButtonModule,
   MdRadioModule,
   MdInputModule,
-  MdSelectModule
+  MdSelectModule,
 } from '@angular/material'
 
 import { AppComponent } from './app.component'
 import { AppFormComponent } from './app-form/app-form.component'
 import { GoalTimesComponent } from './goal-times/goal-times.component'
 import { PracticeGroupsComponent } from './practice-groups/practice-groups.component'
-import { SecondsProExporterComponent } from './seconds-pro-exporter/seconds-pro-exporter.component';
-import { TimePipe } from './time.pipe';
+import { SecondsProExporterComponent } from './seconds-pro-exporter/seconds-pro-exporter.component'
+import { TimePipe } from './time.pipe'
 
 @NgModule({
   declarations: [
@@ -27,7 +27,7 @@ import { TimePipe } from './time.pipe';
     GoalTimesComponent,
     PracticeGroupsComponent,
     SecondsProExporterComponent,
-    TimePipe
+    TimePipe,
   ],
   imports: [
     BrowserModule,
@@ -40,9 +40,9 @@ import { TimePipe } from './time.pipe';
     MdButtonModule,
     MdRadioModule,
     MdInputModule,
-    MdSelectModule
+    MdSelectModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule {}

@@ -14,7 +14,7 @@ import { Rp10 } from './rp10'
       <app-practice-groups class="right-side" *ngIf="rp10" [rp10]="rp10"></app-practice-groups>
     </div>
   `,
-  styles: []
+  styles: [],
 })
 export class AppComponent {
   rp10: Rp10

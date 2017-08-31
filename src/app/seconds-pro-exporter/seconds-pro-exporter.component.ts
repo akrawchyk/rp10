@@ -12,7 +12,7 @@ import { Rp10 } from '../rp10'
     </button>
     <p class="message message--error" *ngIf="errorMessage">{{errorMessage}}</p>
   `,
-  styleUrls: ['./seconds-pro-exporter.component.scss']
+  styleUrls: ['./seconds-pro-exporter.component.scss'],
 })
 export class SecondsProExporterComponent implements OnInit {
   @Input() rp10: Rp10
@@ -23,8 +23,7 @@ export class SecondsProExporterComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   onClick() {
     this.loading = true
@@ -37,12 +36,16 @@ export class SecondsProExporterComponent implements OnInit {
       zip.file(`${name}_RP10_export.seconds`, JSON.stringify(secondsFormat))
     })
 
-    zip.generateAsync({ type: 'blob' })
-      .then(blob => {
-        FileSaver.saveAs(blob, 'RP10_seconds_export.zip')
-      }, err => {
-        this.errorMessage = err.message
-      })
+    zip
+      .generateAsync({ type: 'blob' })
+      .then(
+        blob => {
+          FileSaver.saveAs(blob, 'RP10_seconds_export.zip')
+        },
+        err => {
+          this.errorMessage = err.message
+        }
+      )
       .then(err => {
         this.loading = false
       })

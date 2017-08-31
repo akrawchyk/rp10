@@ -6,7 +6,7 @@ import { Rp10, GoalTime } from '../rp10'
 @Component({
   selector: 'app-form',
   templateUrl: './app-form.component.html',
-  styleUrls: ['./app-form.component.scss']
+  styleUrls: ['./app-form.component.scss'],
 })
 export class AppFormComponent implements OnInit {
   rp10: Rp10
@@ -30,7 +30,7 @@ export class AppFormComponent implements OnInit {
       new GoalTime('33', 50),
       new GoalTime('32', 50),
       new GoalTime('32', 50),
-      new GoalTime('40', 50)
+      new GoalTime('40', 50),
     ]
 
     this.form = fb.group({
@@ -45,8 +45,8 @@ export class AppFormComponent implements OnInit {
       // use text representation for textarea input
       goalTimes: [
         initialGoalTimes.map(goalTime => goalTime.toString()).join('\n'),
-        Validators.required
-      ]
+        Validators.required,
+      ],
     })
 
     this.form.valueChanges.subscribe(form => this.update())
@@ -71,11 +71,11 @@ export class AppFormComponent implements OnInit {
         percentGoalPaceToTrainToday,
         restPerRepeatS,
         goalTimes,
-        sameIntervalS
+        sameIntervalS,
       } = this.form.value
 
       if (this.rp10 && this.rp10.sameIntervalS === sameIntervalS) {
-        // something else changed besides same interval
+        // inputs changed so prepare for new interval choices
         sameIntervalS = null
         this.form.patchValue({ sameIntervalS })
       }
@@ -88,26 +88,29 @@ export class AppFormComponent implements OnInit {
         todayMyTrainingPoolIs,
         percentGoalPaceToTrainToday,
         restPerRepeatS,
-        goalTimes.trim().split('\n').map(GoalTime.fromString),
+        goalTimes
+          .trim()
+          .split('\n')
+          .map(GoalTime.fromString),
         +sameIntervalS
       )
 
       if (!this.rp10.sameIntervalS) {
-        // need to present new interval choices
+        // slowest interval changed so need to present new interval choices
         this.intervalSChoices = (() => {
           // find the slowest pace
           const slowestIntervalS = this.rp10.goalTimes
             .map(goalTime => this.rp10.getPracticePaceForGoalTime(goalTime))
             .reduce((slowestS, pace) => {
-              return pace.intervalS > slowestS ? pace.intervalS: slowestS
+              return pace.intervalS > slowestS ? pace.intervalS : slowestS
             }, 0)
 
           // generate n intervals 5 seconds apart
-          const out = []
+          const intervals = []
           for (let i = 0; i < 25; i++) {
-            out.push(slowestIntervalS + (i * 5))
+            out.push(slowestIntervalS + i * 5)
           }
-          return out
+          return intervals
         })()
       }
     }

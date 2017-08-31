@@ -24,7 +24,7 @@ import { Rp10, formatTimeDisplay } from '../rp10'
       </md-card-content>
     </md-card>
   `,
-  styleUrls: ['./practice-groups.component.scss']
+  styleUrls: ['./practice-groups.component.scss'],
 })
 export class PracticeGroupsComponent implements OnInit, OnChanges {
   @Input() rp10: Rp10
@@ -54,7 +54,7 @@ export class PracticeGroupsComponent implements OnInit, OnChanges {
           intervalDisplay: formatTimeDisplay(practicePace.intervalS),
           totalSetTime: formatTimeDisplay(
             practicePace.intervalS * this.rp10.repCount
-          )
+          ),
         }
       })
     } else {

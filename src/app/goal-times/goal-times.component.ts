@@ -5,7 +5,7 @@ import {
   ValidatorFn,
   ValidationErrors,
   NG_VALUE_ACCESSOR,
-  NG_VALIDATORS
+  NG_VALIDATORS,
 } from '@angular/forms'
 
 import { GoalTime } from '../rp10'
@@ -40,15 +40,15 @@ function createGoalTimeStringsValidator(): ValidatorFn {
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => GoalTimesComponent),
-      multi: true
+      multi: true,
     },
     {
       provide: NG_VALIDATORS,
       useExisting: forwardRef(() => GoalTimesComponent),
-      multi: true
-    }
+      multi: true,
+    },
   ],
-  styleUrls: ['./goal-times.component.scss']
+  styleUrls: ['./goal-times.component.scss'],
 })
 export class GoalTimesComponent implements OnInit, ControlValueAccessor {
   @Input('value') _value: string = ''

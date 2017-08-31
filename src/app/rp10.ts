@@ -1,25 +1,39 @@
 import * as moment from 'moment'
 
 const GOAL_DURATION_RE = /^(\d{0,2}:)?\d{2}(\.\d{0,2})?$/
-const GOAL_DISTANCES_LIST = [25000, 10000, 1650, 1500, 1000, 800, 500, 400, 300, 200, 100, 50, 25]
+const GOAL_DISTANCES_LIST = [
+  25000,
+  10000,
+  1650,
+  1500,
+  1000,
+  800,
+  500,
+  400,
+  300,
+  200,
+  100,
+  50,
+  25,
+]
 
 const POOLS = {
   SCY: 0,
   SCM: 1,
-  LCM: 2
+  LCM: 2,
 }
 
 const TIMES = {
   [POOLS.SCY]: moment.duration('00:3:33.42').asSeconds(),
   [POOLS.SCM]: moment.duration('00:3:55.50').asSeconds(),
-  [POOLS.LCM]: moment.duration('00:4:03.84').asSeconds()
+  [POOLS.LCM]: moment.duration('00:4:03.84').asSeconds(),
 }
 
 const POOL_LENGTH_FACTORS = [POOLS.SCY, POOLS.SCM, POOLS.LCM].map(poolType => {
   return [
     TIMES[poolType] / TIMES[POOLS.SCY],
     TIMES[poolType] / TIMES[POOLS.SCM],
-    TIMES[poolType] / TIMES[POOLS.LCM]
+    TIMES[poolType] / TIMES[POOLS.LCM],
   ]
 })
 
@@ -29,7 +43,7 @@ function poolType(fromLength) {
   return {
     to: toLength => {
       return POOL_LENGTH_FACTORS[POOLS[_fromLength]][POOLS[toLength]]
-    }
+    },
   }
 }
 
@@ -54,7 +68,8 @@ export function formatTimeDisplay(timeS: number): string {
   }
 
   // round up to nearest 100th and add 10th's place
-  const tenths = (Math.ceil(timeDuration.milliseconds() / 100) * 100).toString()[0]
+  const tenths = (Math.ceil(timeDuration.milliseconds() / 100) *
+    100).toString()[0]
   if (timeDisplayMs) {
     timeDisplay = `${timeDisplay}.${tenths}`
   }
@@ -164,13 +179,15 @@ export class Rp10 {
     if (this.sameIntervalS) {
       intervalToTrainTodayS = this.sameIntervalS
     } else {
-      intervalToTrainTodayS = moment.duration(
-        targetToTrainTodayS + this.restPerRepeatS,
-        'seconds'
-      ).asSeconds()
+      intervalToTrainTodayS = moment
+        .duration(targetToTrainTodayS + this.restPerRepeatS, 'seconds')
+        .asSeconds()
     }
 
-    return new PracticePace(targetToTrainTodayS, Math.ceil(intervalToTrainTodayS))
+    return new PracticePace(
+      targetToTrainTodayS,
+      Math.ceil(intervalToTrainTodayS)
+    )
   }
 
   getTargetToTrainTodayS(goalTime: GoalTime): number {
@@ -204,8 +221,8 @@ export class Rp10 {
 
       return new SecondsProFormat(
         name,
-        intervals.map((repCount, idxx) => {
-          const iname = `rep ${idxx + 1} -> ${repCount}x${this
+        intervals.map((repCount, jdx) => {
+          const iname = `rep ${jdx + 1} -> ${repCount}x${this
             .todaysRepeats} target: ${formatTimeDisplay(practicePace.targetS)}`
           return new SecondsProIntervalFormat(iname, practicePace.intervalS)
         })
