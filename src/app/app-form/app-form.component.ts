@@ -90,6 +90,8 @@ export class AppFormComponent implements OnInit {
         goalTimes
           .trim()
           .split('\n')
+          .map(line => line.trim())
+          .filter(exists => exists)
           .map(GoalTime.fromString),
         +sameIntervalS
       )

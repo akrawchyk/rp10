@@ -19,7 +19,12 @@ function createGoalTimeStringsValidator(): ValidatorFn {
 
       try {
         // validate
-        value.split('\n').map(GoalTime.fromString)
+        value
+          .trim()
+          .split('\n')
+          .map(line => line.trim())
+          .filter(exists => exists)
+          .map(GoalTime.fromString)
         return null
       } catch (err) {
         return { formatting: { message: err.message, actualValue: value } }

@@ -66,9 +66,12 @@ export function formatTimeDisplay(timeS: number): string {
   // add leading colon to seconds
   timeDisplay = `:${timeDisplay}`
 
-  // add minutes
   if (timeDisplayM) {
+    // add minutes
     timeDisplay = `${timeDisplayM}${timeDisplay}`
+  } else if (timeDisplayH) {
+    // add empty minutes for hours
+    timeDisplay = `00${timeDisplay}`
   }
 
   // add hours
