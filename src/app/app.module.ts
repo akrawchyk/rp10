@@ -18,7 +18,7 @@ import { AppFormComponent } from './app-form/app-form.component'
 import { GoalTimesComponent } from './goal-times/goal-times.component'
 import { PracticeGroupsComponent } from './practice-groups/practice-groups.component'
 import { SecondsProExporterComponent } from './seconds-pro-exporter/seconds-pro-exporter.component'
-import { TimePipe } from './time.pipe'
+import { DurationPipe } from './duration.pipe'
 
 @NgModule({
   declarations: [
@@ -27,7 +27,7 @@ import { TimePipe } from './time.pipe'
     GoalTimesComponent,
     PracticeGroupsComponent,
     SecondsProExporterComponent,
-    TimePipe,
+    DurationPipe,
   ],
   imports: [
     BrowserModule,

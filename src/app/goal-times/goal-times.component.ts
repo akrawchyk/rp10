@@ -20,10 +20,8 @@ function createGoalTimeStringsValidator(): ValidatorFn {
       try {
         // validate
         value
-          .trim()
           .split('\n')
-          .map(line => line.trim())
-          .filter(exists => exists)
+          .filter(line => line.trim())
           .map(GoalTime.fromString)
         return null
       } catch (err) {

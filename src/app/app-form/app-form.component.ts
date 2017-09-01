@@ -88,10 +88,8 @@ export class AppFormComponent implements OnInit {
         percentGoalPaceToTrainToday,
         restPerRepeatS,
         goalTimes
-          .trim()
           .split('\n')
-          .map(line => line.trim())
-          .filter(exists => exists)
+          .filter(line => line.trim())
           .map(GoalTime.fromString),
         +sameIntervalS
       )

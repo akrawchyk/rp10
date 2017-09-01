@@ -1,7 +1,7 @@
 import * as moment from 'moment'
 
-// hh:mm:ss.msms, see http://refiddle.com/nl56
-const GOAL_DURATION_RE = /^(\d{0,2}:)?([0-5]?\d?:)?[0-5]?\d?(\.\d{0,2})?$/
+// TODO use lookaheads to avoid matching 99:22.00
+const GOAL_DURATION_RE = /^(\d{0,2}:)?([0-5]?\d?:)?[0-5]?\d(\.\d{0,2})?$/
 const GOAL_DISTANCES_LIST = [
   25000,
   10000,
@@ -50,53 +50,102 @@ function poolType(fromLength) {
   }
 }
 
-export function formatTimeDisplay(timeS: number): string {
-  const timeDuration = moment.duration(timeS, 'seconds')
-  let timeDisplayH = timeDuration.hours()
-  let timeDisplayM = timeDuration.minutes()
-  let timeDisplayS = timeDuration.seconds()
-  let timeDisplayMs = timeDuration.milliseconds()
-  let timeDisplay = `${timeDisplayS}`
+export function formatDurationDisplay(durationS: number): string {
+  const duration = moment.duration(durationS, 'seconds')
+  let durationDisplayH = duration.hours()
+  let durationDisplayM = duration.minutes()
+  let durationDisplayS = duration.seconds()
+  let durationDisplayMs = duration.milliseconds()
+  let durationDisplay = `${durationDisplayS}`
 
   // add leading 0 to seconds
-  if (timeDisplay.length === 1) {
-    timeDisplay = `0${timeDisplayS}`
+  if (durationDisplay.length === 1) {
+    durationDisplay = `0${durationDisplayS}`
   }
 
   // add leading colon to seconds
-  timeDisplay = `:${timeDisplay}`
+  durationDisplay = `:${durationDisplay}`
 
-  if (timeDisplayM) {
+  if (durationDisplayM) {
+    // add leading 0 to minutes for hours
+    if (durationDisplayH && durationDisplayM.length === 1) {
+      durationDisplayM = `0${durationDisplayM}`
+    }
+
     // add minutes
-    timeDisplay = `${timeDisplayM}${timeDisplay}`
-  } else if (timeDisplayH) {
+    durationDisplay = `${durationDisplayM}${durationDisplay}`
+  } else if (durationDisplayH) {
     // add empty minutes for hours
-    timeDisplay = `00${timeDisplay}`
+    durationDisplay = `00${durationDisplay}`
   }
 
   // add hours
-  if (timeDisplayH) {
-    timeDisplay = `${timeDisplayH}:${timeDisplay}`
+  if (durationDisplayH) {
+    durationDisplay = `${durationDisplayH}:${durationDisplay}`
   }
 
   // round up to nearest 100th and add 10th's place
-  const tenths = (Math.ceil(timeDuration.milliseconds() / 100) *
+  const tenths = (Math.ceil(duration.milliseconds() / 100) *
     100).toString()[0]
-  if (timeDisplayMs) {
-    timeDisplay = `${timeDisplay}.${tenths}`
+  if (durationDisplayMs) {
+    durationDisplay = `${durationDisplay}.${tenths}`
   }
 
-  return timeDisplay
+  return durationDisplay
 }
 
 export class GoalTime {
+  durationS: number
+
+  displayDuration: string|number
+
   constructor(
-    public duration: string,
+    duration: number|string,
     public distance: number,
     public name?: string
-  ) {}
+  ) {
+    if (typeof duration === 'number') {
+      this.durationS = duration
+    } else if (typeof duration === 'string') {
+      const durationS = GoalTime.getDurationSFromString(duration)
+
+      if (!durationS) {
+        throw new TypeError(
+          `GoalTime constructor unexpected duration, got \`${duration}\``
+        )
+      }
+
+      this.durationS = durationS
+      this.displayDuration = duration
+    }
+  }
+
+  private static getDurationSFromString(duration: string) {
+    if (duration.search(GOAL_DURATION_RE) === -1) {
+      throw new TypeError(
+        `GoalTime.getDurationSFromString expected duration format to be \`hh:mm:ss.msms\`, got \`${duration}\``
+      )
+    }
+
+    let split = duration.trim().split(':')
+
+    if (!split.length) {
+      throw new TypeError(
+        `GoalTime.getDurationSFromString expected duration, got \`${duration}\``
+      )
+    }
+
+    // format for moment
+    while (split.length < 3) {
+      // transform to hh:mm:ss.msms format
+      split = ['00', ...split]
+    }
+
+    return moment.duration(split.join(':'), 'seconds').asSeconds()
+  }
 
   public static fromString(goalTimeString: string): GoalTime {
+    // expects format: <duration:string> <distance:number> <name:string>...
     const read = goalTimeString.split(' ').filter(present => present)
 
     if (read.length < 2) {
@@ -105,23 +154,15 @@ export class GoalTime {
       )
     }
 
-    // format: duration distance name...
-    const duration = read[0].trim()
-    const distance = +read[1].trim()
-    let name = ''
-    let readName = read.slice(2)
+    const durationS = GoalTime.getDurationSFromString(read[0])
 
-    if (readName.length) {
-      name = readName.map(n => n.trim()).join(' ')
-    } else {
-      name = null
-    }
-
-    if (!duration || duration.search(GOAL_DURATION_RE) === -1) {
+    if (!durationS) {
       throw new TypeError(
-        `GoalTime.fromString expected duration format to be \`hh:mm:ss.msms\`, got \`${read[0]}\``
+        `GoalTime.fromString unexpected duration, got \`${read[0]}\``
       )
     }
+
+    const distance = +read[1].trim()
 
     if (!distance || isNaN(distance)) {
       throw new TypeError(
@@ -133,11 +174,20 @@ export class GoalTime {
       )
     }
 
-    return new GoalTime(duration, distance, name)
+    let readName = read.slice(2)
+    let name = ''
+
+    if (readName.length) {
+      name = readName.map(n => n.trim()).join(' ')
+    } else {
+      name = null
+    }
+
+    return new GoalTime(read[0], distance, name)
   }
 
   toString(): string {
-    return [this.duration, this.distance, this.name].join(' ')
+    return [this.displayDuration, this.distance, this.name].join(' ')
   }
 }
 
@@ -153,7 +203,7 @@ export class PracticeGroup {
 class SecondsProIntervalFormat {
   constructor(
     public name: string,
-    public duration: number,
+    public durationS: number,
     public color: number = 3
   ) {}
 }
@@ -204,11 +254,7 @@ export class Rp10 {
   }
 
   getTargetToTrainTodayS(goalTime: GoalTime): number {
-    const split = goalTime.duration.split(':')
-    while (split.length < 3) {
-      split.unshift('00') // to 00:00:00.000 format, https://momentjs.com/docs/#/durations/creating/
-    }
-    const m = moment.duration(split.join(':'))
+    const m = moment.duration(goalTime.durationS, 'seconds')
     const percentGoalPaceS =
       m.asSeconds() * (1 / (this.percentGoalPaceToTrainToday / 100))
     return (
@@ -236,7 +282,7 @@ export class Rp10 {
         name,
         intervals.map((repCount, jdx) => {
           const iname = `rep ${jdx + 1} -> ${repCount}x${this
-            .todaysRepeats} target: ${formatTimeDisplay(practicePace.targetS)}`
+            .todaysRepeats} target: ${formatDurationDisplay(practicePace.targetS)}`
           return new SecondsProIntervalFormat(iname, practicePace.intervalS)
         })
       )
