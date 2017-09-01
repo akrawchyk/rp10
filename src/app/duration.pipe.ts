@@ -6,7 +6,7 @@ import { formatDurationDisplay } from './rp10'
   name: 'duration',
 })
 export class DurationPipe implements PipeTransform {
-  transform(valueS: number, args?: any): any {
-    return formatDurationDisplay(valueS)
+  transform(duration: number, args?: any): any {
+    return formatDurationDisplay(duration)
   }
 }

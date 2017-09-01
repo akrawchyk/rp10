@@ -50,8 +50,8 @@ function poolType(fromLength) {
   }
 }
 
-export function formatDurationDisplay(durationS: number): string {
-  const duration = moment.duration(durationS, 'seconds')
+export function formatDurationDisplay(input: number): string {
+  const duration = moment.duration(input, 'seconds')  // TODO use milliseconds
   let durationDisplayH = duration.hours()
   let durationDisplayM = duration.minutes()
   let durationDisplayS = duration.seconds()
@@ -95,35 +95,35 @@ export function formatDurationDisplay(durationS: number): string {
 }
 
 export class GoalTime {
-  durationS: number
+  duration: number
 
   displayDuration: string|number
 
   constructor(
-    duration: number|string,
+    input: number|string,
     public distance: number,
     public name?: string
   ) {
-    if (typeof duration === 'number') {
-      this.durationS = duration
-    } else if (typeof duration === 'string') {
-      const durationS = GoalTime.getDurationSFromString(duration)
+    if (typeof input === 'number') {
+      this.duration = input
+    } else if (typeof input === 'string') {
+      const duration = GoalTime.getDurationFromString(input)
 
-      if (!durationS) {
+      if (!duration) {
         throw new TypeError(
-          `GoalTime constructor unexpected duration, got \`${duration}\``
+          `GoalTime constructor unexpected duration, got \`${input}\``
         )
       }
 
-      this.durationS = durationS
-      this.displayDuration = duration
+      this.duration = duration
+      this.displayDuration = input
     }
   }
 
-  private static getDurationSFromString(duration: string) {
+  private static getDurationFromString(duration: string) {
     if (duration.search(GOAL_DURATION_RE) === -1) {
       throw new TypeError(
-        `GoalTime.getDurationSFromString expected duration format to be \`hh:mm:ss.msms\`, got \`${duration}\``
+        `GoalTime.getDurationFromString expected duration format to be \`hh:mm:ss.msms\`, got \`${duration}\``
       )
     }
 
@@ -131,7 +131,7 @@ export class GoalTime {
 
     if (!split.length) {
       throw new TypeError(
-        `GoalTime.getDurationSFromString expected duration, got \`${duration}\``
+        `GoalTime.getDurationFromString expected duration, got \`${duration}\``
       )
     }
 
@@ -141,7 +141,7 @@ export class GoalTime {
       split = ['00', ...split]
     }
 
-    return moment.duration(split.join(':'), 'seconds').asSeconds()
+    return moment.duration(split.join(':'), 'seconds').asSeconds() // TODO use milliseconds
   }
 
   public static fromString(goalTimeString: string): GoalTime {
@@ -154,9 +154,9 @@ export class GoalTime {
       )
     }
 
-    const durationS = GoalTime.getDurationSFromString(read[0])
+    const duration = GoalTime.getDurationFromString(read[0])
 
-    if (!durationS) {
+    if (!duration) {
       throw new TypeError(
         `GoalTime.fromString unexpected duration, got \`${read[0]}\``
       )
@@ -191,19 +191,10 @@ export class GoalTime {
   }
 }
 
-export class PracticePace {
-  constructor(public targetS: number, public intervalS: number) {}
-}
-
-export class PracticeGroup {
-  // data for outputs
-  constructor(public goalTime: GoalTime, public practicePace: PracticePace) {}
-}
-
 class SecondsProIntervalFormat {
   constructor(
     public name: string,
-    public durationS: number,
+    public duration: number,
     public color: number = 3
   ) {}
 }
@@ -228,37 +219,33 @@ export class Rp10 {
     public myGoalTimeIsFor: string,
     public todayMyTrainingPoolIs: string,
     public percentGoalPaceToTrainToday: number,
-    public restPerRepeatS: number,
+    public restPerRepeat: number,
     public goalTimes: GoalTime[],
-    public sameIntervalS?: number
+    public sameInterval?: number
   ) {}
 
   // TODO getter/setter for percentage units
 
-  getPracticePaceForGoalTime(goalTime: GoalTime): PracticePace {
-    const targetToTrainTodayS = this.getTargetToTrainTodayS(goalTime)
-    let intervalToTrainTodayS
+  getIntervalForGoalTime(goalTime: GoalTime): number {
+    let intervalToTrainToday
 
-    if (this.sameIntervalS) {
-      intervalToTrainTodayS = this.sameIntervalS
+    if (this.sameInterval) {
+      intervalToTrainToday = this.sameInterval
     } else {
-      intervalToTrainTodayS = moment
-        .duration(targetToTrainTodayS + this.restPerRepeatS, 'seconds')
+      intervalToTrainToday = moment
+        .duration(this.getTargetForGoalTime(goalTime) + this.restPerRepeat, 'seconds')
         .asSeconds()
     }
 
-    return new PracticePace(
-      targetToTrainTodayS,
-      Math.ceil(intervalToTrainTodayS)
-    )
+    return Math.ceil(intervalToTrainToday)
   }
 
-  getTargetToTrainTodayS(goalTime: GoalTime): number {
-    const m = moment.duration(goalTime.durationS, 'seconds')
-    const percentGoalPaceS =
+  getTargetForGoalTime(goalTime: GoalTime): number {
+    const m = moment.duration(goalTime.duration, 'seconds')
+    const percentGoalPace =
       m.asSeconds() * (1 / (this.percentGoalPaceToTrainToday / 100))
     return (
-      percentGoalPaceS /
+      percentGoalPace /
         goalTime.distance *
         this.todaysRepeats *
         poolType(this.todayMyTrainingPoolIs).to(this.myGoalTimeIsFor) +
@@ -268,7 +255,8 @@ export class Rp10 {
 
   toSecondsProFormat(): SecondsProFormat[] {
     return this.goalTimes.map((goalTime, idx) => {
-      const practicePace = this.getPracticePaceForGoalTime(goalTime)
+      const interval = this.getIntervalForGoalTime(goalTime)
+      const target = this.getTargetForGoalTime(goalTime)
       const name = goalTime.name || `Group ${idx + 1}`
       const intervals = []
       while (intervals.length !== this.repCount) {
@@ -282,8 +270,8 @@ export class Rp10 {
         name,
         intervals.map((repCount, jdx) => {
           const iname = `rep ${jdx + 1} -> ${repCount}x${this
-            .todaysRepeats} target: ${formatDurationDisplay(practicePace.targetS)}`
-          return new SecondsProIntervalFormat(iname, practicePace.intervalS)
+            .todaysRepeats} target: ${formatDurationDisplay(target)}`
+          return new SecondsProIntervalFormat(iname, interval)
         })
       )
     })

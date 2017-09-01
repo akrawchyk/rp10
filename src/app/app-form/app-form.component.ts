@@ -15,8 +15,9 @@ export class AppFormComponent implements OnInit {
 
   repeatChoices: number[] = [25, 50, 75, 100, 125, 150, 175, 200, 225, 250]
   poolLengthChoices: string[] = ['SCY', 'SCM', 'LCM']
-  intervalSChoices: number[] = []
+  intervalChoices: number[] = []
 
+  // TODO debouce/throttle inputs
   form: FormGroup
 
   constructor(private fb: FormBuilder) {
@@ -39,8 +40,8 @@ export class AppFormComponent implements OnInit {
       myGoalTimeIsFor: ['SCY', Validators.required],
       todayMyTrainingPoolIs: ['SCM', Validators.required],
       percentGoalPaceToTrainToday: [100, Validators.required],
-      restPerRepeatS: [25, Validators.required],
-      sameIntervalS: null,
+      restPerRepeat: [25, Validators.required],
+      sameInterval: null,
       // use text representation for textarea input
       goalTimes: [
         initialGoalTimes.map(goalTime => goalTime.toString()).join('\n'),
@@ -59,7 +60,7 @@ export class AppFormComponent implements OnInit {
     // update interval choices
     if (!this.form.valid) {
       this.rp10 = null
-      this.intervalSChoices = []
+      this.intervalChoices = []
     } else {
       let {
         todaysRepeats,
@@ -68,15 +69,15 @@ export class AppFormComponent implements OnInit {
         myGoalTimeIsFor,
         todayMyTrainingPoolIs,
         percentGoalPaceToTrainToday,
-        restPerRepeatS,
+        restPerRepeat,
         goalTimes,
-        sameIntervalS,
+        sameInterval,
       } = this.form.value
 
-      if (this.rp10 && this.rp10.sameIntervalS === sameIntervalS) {
+      if (this.rp10 && this.rp10.sameInterval === sameInterval) {
         // inputs changed so prepare for new interval choices
-        sameIntervalS = null
-        this.form.patchValue({ sameIntervalS })
+        sameInterval = null
+        this.form.patchValue({ sameInterval })
       }
 
       this.rp10 = new Rp10(
@@ -86,28 +87,28 @@ export class AppFormComponent implements OnInit {
         myGoalTimeIsFor,
         todayMyTrainingPoolIs,
         percentGoalPaceToTrainToday,
-        restPerRepeatS,
+        restPerRepeat,
         goalTimes
           .split('\n')
           .filter(line => line.trim())
           .map(GoalTime.fromString),
-        +sameIntervalS
+        +sameInterval
       )
 
-      if (!this.rp10.sameIntervalS) {
+      if (!this.rp10.sameInterval) {
         // slowest interval changed so need to present new interval choices
-        this.intervalSChoices = (() => {
+        this.intervalChoices = (() => {
           // find the slowest pace
-          const slowestIntervalS = this.rp10.goalTimes
-            .map(goalTime => this.rp10.getPracticePaceForGoalTime(goalTime))
-            .reduce((slowestS, pace) => {
-              return pace.intervalS > slowestS ? pace.intervalS : slowestS
+          const slowestInterval = this.rp10.goalTimes
+            .map(goalTime => this.rp10.getIntervalForGoalTime(goalTime))
+            .reduce((slowest, interval) => {
+              return interval > slowest ? interval : slowest
             }, 0)
 
           // generate n intervals 5 seconds apart
           const intervals = []
           for (let i = 0; i < 25; i++) {
-            intervals.push(slowestIntervalS + i * 5)
+            intervals.push(slowestInterval + i * 5)
           }
           return intervals
         })()

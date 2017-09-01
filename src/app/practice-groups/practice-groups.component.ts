@@ -14,10 +14,10 @@ import { Rp10  } from '../rp10'
       </md-card-header>
       <md-card-content>
         <md-list>
-          <md-list-item>Target: {{group.practicePace.targetS | duration}}</md-list-item>
-          <md-list-item>Interval: {{group.practicePace.intervalS | duration}}</md-list-item>
-          <md-list-item>Goal event: {{group.goalTime.distance}}{{group.goalPoolType}} @ {{group.goalTime.durationS | duration}}</md-list-item>
-          <md-list-item>Total set time: {{group.totalSetTimeS | duration}}</md-list-item>
+          <md-list-item>Target: {{group.target | duration}}</md-list-item>
+          <md-list-item>Interval: {{group.interval | duration}}</md-list-item>
+          <md-list-item>Goal event: {{group.goalTime.distance}}{{group.goalPoolType}} @ {{group.goalTime.duration | duration}}</md-list-item>
+          <md-list-item>Total set time: {{group.totalSetTime | duration}}</md-list-item>
         </md-list>
       </md-card-content>
     </md-card>
@@ -41,16 +41,19 @@ export class PracticeGroupsComponent implements OnInit, OnChanges {
 
   _setGroups() {
     if (this.rp10) {
+
       this.groups = this.rp10.goalTimes.map(goalTime => {
-        const practicePace = this.rp10.getPracticePaceForGoalTime(goalTime)
+        const target = this.rp10.getTargetForGoalTime(goalTime)
+        const interval = this.rp10.getIntervalForGoalTime(goalTime)
 
         return {
           goalTime,
           goalPoolType: this.rp10.myGoalTimeIsFor[
             this.rp10.myGoalTimeIsFor.length - 1
           ].toLowerCase(),
-          practicePace,
-          totalSetTimeS: practicePace.intervalS * this.rp10.repCount
+          target,
+          interval,
+          totalSetTime: interval * this.rp10.repCount
         }
       })
     } else {

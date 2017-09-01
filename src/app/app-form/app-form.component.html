@@ -17,7 +17,7 @@
   <div class="form-control">
     <label># of seconds rest per repeat</label>
     <md-input-container>
-      <input mdInput formControlName="restPerRepeatS" type="number">
+      <input mdInput formControlName="restPerRepeat" type="number">
     </md-input-container>
   </div>
 
@@ -66,10 +66,10 @@
 
   <div *ngIf="rp10" class="form-control">
     <label>Keep everyone on the same interval:</label>
-    <md-select formControlName="sameIntervalS">
+    <md-select formControlName="sameInterval">
       <md-option [value]="">Unselect interval</md-option>
-      <md-option *ngFor="let intervalS of intervalSChoices" [value]="intervalS">
-        {{intervalS | duration}}
+      <md-option *ngFor="let interval of intervalChoices" [value]="interval">
+        {{interval | duration}}
       </md-option>
     </md-select>
   </div>
