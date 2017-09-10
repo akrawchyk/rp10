@@ -10,8 +10,13 @@ import { Rp10 } from './rp10'
       <span>RP10</span>
     </md-toolbar>
     <div class="wrap">
-      <app-form class="left-side" (update)="setRp10($event)"></app-form>
-      <app-practice-groups class="right-side" *ngIf="rp10" [rp10]="rp10"></app-practice-groups>
+      <div class="left-side">
+        <app-form (update)="setRp10($event)"></app-form>
+        <app-seconds-pro-exporter *ngIf="rp10" [rp10]="rp10"></app-seconds-pro-exporter>
+      </div>
+      <div class="right-side">
+        <app-practice-groups *ngIf="rp10" [rp10]="rp10"></app-practice-groups>
+      </div>
     </div>
   `,
   styles: [],

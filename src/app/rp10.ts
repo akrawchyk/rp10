@@ -50,7 +50,7 @@ function poolType(fromLength) {
 }
 
 export function formatDurationDisplay(input: number): string {
-  const duration = moment.duration(input, 'seconds')  // TODO use milliseconds
+  const duration = moment.duration(input, 'seconds') // TODO use milliseconds
   let durationDisplayH = duration.hours()
   let durationDisplayM = duration.minutes()
   let durationDisplayS = duration.seconds()
@@ -84,8 +84,7 @@ export function formatDurationDisplay(input: number): string {
   }
 
   // round up to nearest 100th and add 10th's place
-  const tenths = (Math.ceil(duration.milliseconds() / 100) *
-    100).toString()[0]
+  const tenths = (Math.ceil(duration.milliseconds() / 100) * 100).toString()[0]
   if (durationDisplayMs) {
     durationDisplay = `${durationDisplay}.${tenths}`
   }
@@ -96,10 +95,10 @@ export function formatDurationDisplay(input: number): string {
 export class GoalTime {
   duration: number
 
-  displayDuration: string|number
+  displayDuration: string | number
 
   constructor(
-    input: number|string,
+    input: number | string,
     public distance: number,
     public name?: string
   ) {
@@ -169,7 +168,11 @@ export class GoalTime {
     }
 
     // handles leading `00:`
-    let split = duration.replace(/:/g, ' ').trim().split(' ').filter(exists => !!+exists)
+    let split = duration
+      .replace(/:/g, ' ')
+      .trim()
+      .split(' ')
+      .filter(exists => !!+exists)
 
     if (!split.length || split.length > 3) {
       throw new TypeError(
@@ -178,7 +181,7 @@ export class GoalTime {
     }
 
     // seconds.milliseconds?
-    const seconds = split[split.length-1].split('.')[0]
+    const seconds = split[split.length - 1].split('.')[0]
 
     if (+seconds >= 60) {
       throw new TypeError(
@@ -187,7 +190,7 @@ export class GoalTime {
     }
 
     // minutes:seconds.milliseconds?
-    const minutes = split[split.length-2]
+    const minutes = split[split.length - 2]
 
     if (minutes && +minutes >= 60) {
       throw new TypeError(
@@ -201,7 +204,7 @@ export class GoalTime {
       split = ['00', ...split]
     }
 
-    return moment.duration(split.join(':')).asSeconds() // TODO use milliseconds
+    return moment.duration(split.join(':')).asSeconds() // TODO use milliseconds?
   }
 
   toString(): string {
@@ -251,7 +254,10 @@ export class Rp10 {
       intervalToTrainToday = this.sameInterval
     } else {
       intervalToTrainToday = moment
-        .duration(this.getTargetForGoalTime(goalTime) + this.restPerRepeat, 'seconds')
+        .duration(
+          this.getTargetForGoalTime(goalTime) + this.restPerRepeat,
+          'seconds'
+        )
         .asSeconds()
     }
 
