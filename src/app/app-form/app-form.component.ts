@@ -57,7 +57,6 @@ export class AppFormComponent implements OnInit {
   }
 
   update(): void {
-    // update interval choices
     if (!this.form.valid) {
       this.rp10 = null
       this.intervalChoices = []
@@ -80,6 +79,12 @@ export class AppFormComponent implements OnInit {
         this.form.patchValue({ sameInterval })
       }
 
+      // transform goal times from string
+      goalTimes = goalTimes
+        .split('\n')
+        .filter(line => line.trim())
+        .map(GoalTime.fromString),
+
       this.rp10 = new Rp10(
         todaysRepeats,
         repCount,
@@ -88,33 +93,32 @@ export class AppFormComponent implements OnInit {
         todayMyTrainingPoolIs,
         percentGoalPaceToTrainToday,
         restPerRepeat,
-        goalTimes
-          .split('\n')
-          .filter(line => line.trim())
-          .map(GoalTime.fromString),
-        +sameInterval
+        goalTimes,
+        +sameInterval // XXX: +null === 0
       )
 
       if (!this.rp10.sameInterval) {
         // slowest interval changed so need to present new interval choices
-        this.intervalChoices = (() => {
-          // find the slowest pace
-          const slowestInterval = this.rp10.goalTimes
-            .map(goalTime => this.rp10.getIntervalForGoalTime(goalTime))
-            .reduce((slowest, interval) => {
-              return interval > slowest ? interval : slowest
-            }, 0)
-
-          // generate n intervals 5 seconds apart
-          const intervals = []
-          for (let i = 0; i < 25; i++) {
-            intervals.push(slowestInterval + i * 5)
-          }
-          return intervals
-        })()
+        this.updateIntervalChoices()
       }
     }
 
     this.change.emit(this.rp10)
+  }
+
+  private updateIntervalChoices(): void {
+    // find the slowest pace
+    const slowestInterval = this.rp10.goalTimes
+      .map(goalTime => this.rp10.getIntervalForGoalTime(goalTime))
+      .reduce((slowest, interval) => {
+        return interval > slowest ? interval : slowest
+      }, 0)
+
+    // generate n intervals 5 seconds apart
+    const intervals = []
+    for (let i = 0; i < 25; i++) {
+      intervals.push(slowestInterval + i * 5)
+    }
+    this.intervalChoices = intervals
   }
 }

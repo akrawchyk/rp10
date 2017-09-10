@@ -1,7 +1,6 @@
 import * as moment from 'moment'
 
-// TODO use lookaheads to avoid matching 99:22.00
-const GOAL_DURATION_RE = /^(\d{0,2}:)?([0-5]?\d?:)?[0-5]?\d(\.\d{0,2})?$/
+const DURATION_RE = /^[:.\d]+$/
 const GOAL_DISTANCES_LIST = [
   25000,
   10000,
@@ -107,7 +106,7 @@ export class GoalTime {
     if (typeof input === 'number') {
       this.duration = input
     } else if (typeof input === 'string') {
-      const duration = GoalTime.getDurationFromString(input)
+      const duration = GoalTime.parseDuration(input)
 
       if (!duration) {
         throw new TypeError(
@@ -120,30 +119,6 @@ export class GoalTime {
     }
   }
 
-  private static getDurationFromString(duration: string) {
-    if (duration.search(GOAL_DURATION_RE) === -1) {
-      throw new TypeError(
-        `GoalTime.getDurationFromString expected duration format to be \`hh:mm:ss.msms\`, got \`${duration}\``
-      )
-    }
-
-    let split = duration.trim().split(':')
-
-    if (!split.length) {
-      throw new TypeError(
-        `GoalTime.getDurationFromString expected duration, got \`${duration}\``
-      )
-    }
-
-    // format for moment
-    while (split.length < 3) {
-      // transform to hh:mm:ss.msms format
-      split = ['00', ...split]
-    }
-
-    return moment.duration(split.join(':'), 'seconds').asSeconds() // TODO use milliseconds
-  }
-
   public static fromString(goalTimeString: string): GoalTime {
     // expects format: <duration:string> <distance:number> <name:string>...
     const read = goalTimeString.split(' ').filter(present => present)
@@ -154,7 +129,7 @@ export class GoalTime {
       )
     }
 
-    const duration = GoalTime.getDurationFromString(read[0])
+    const duration = GoalTime.parseDuration(read[0])
 
     if (!duration) {
       throw new TypeError(
@@ -184,6 +159,49 @@ export class GoalTime {
     }
 
     return new GoalTime(read[0], distance, name)
+  }
+
+  private static parseDuration(duration: string): number {
+    if (duration.search(DURATION_RE) === -1) {
+      throw new TypeError(
+        `GoalTime.parseDuration expected duration format to be \`hh:mm:ss.msms\`, got \`${duration}\``
+      )
+    }
+
+    // handles leading `00:`
+    let split = duration.replace(/:/g, ' ').trim().split(' ').filter(exists => !!+exists)
+
+    if (!split.length || split.length > 3) {
+      throw new TypeError(
+        `GoalTime.parseDuration expected duration, got \`${duration}\``
+      )
+    }
+
+    // seconds.milliseconds?
+    const seconds = split[split.length-1].split('.')[0]
+
+    if (+seconds >= 60) {
+      throw new TypeError(
+        `GoalTime.parseDuration expected seconds to be less than 60, got \`${seconds}\``
+      )
+    }
+
+    // minutes:seconds.milliseconds?
+    const minutes = split[split.length-2]
+
+    if (minutes && +minutes >= 60) {
+      throw new TypeError(
+        `GoalTime.parseDuration expected minutes to be less than 60, got \`${minutes}\``
+      )
+    }
+
+    // format for moment
+    while (split.length < 3) {
+      // transform to hh:mm:ss.msms format
+      split = ['00', ...split]
+    }
+
+    return moment.duration(split.join(':')).asSeconds() // TODO use milliseconds
   }
 
   toString(): string {
