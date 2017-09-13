@@ -21,6 +21,7 @@ import { Rp10 } from '../rp10'
         <span class="material-icons">get_app</span> Export to .seconds
       </button>
       <p class="message message--error" *ngIf="errorMessage">{{errorMessage}}</p>
+      <p class="message message--success" *ngIf="successMessage">{{successMessage}}</p>
     </form>
   `,
   styleUrls: ['./seconds-pro-exporter.component.scss'],
@@ -29,6 +30,7 @@ export class SecondsProExporterComponent implements OnInit {
   @Input() rp10: Rp10
 
   errorMessage: string = ''
+  successMessage: string = ''
   mailcheckSuggestion: string = ''
   loading: boolean = false
   form: FormGroup
@@ -51,7 +53,7 @@ export class SecondsProExporterComponent implements OnInit {
     this.errorMessage = ''
 
     // export rp10 -> .seconds -> POST
-    const secondsFormatted = this.rp10
+    const secondsFormat = this.rp10
       .toSecondsProFormat()
       .map(secondsFormat => {
         const name = secondsFormat.name.split(' ').join('_')
@@ -62,21 +64,27 @@ export class SecondsProExporterComponent implements OnInit {
       })
 
     const body = {
-      email: this.form.value.email,
-      export: secondsFormatted
+      emailAddress: this.form.value.email,
+      data: JSON.stringify(secondsFormat)
     }
 
     this.emailExportService
       .newEmail(body)
       .then(res => {
-        console.log(res)
+        this.errorMessage = ''
+        this.successMessage = res.message
         this.loading = false
       })
-      .catch(err => (this.errorMessage = err.message))
+      .catch(err => {
+        this.errorMessage = err.statusText
+        this.successMessage = ''
+        this.loading = false
+      })
   }
 
   update() {
     this.errorMessage = ''
+    this.successMessage = ''
 
     mailcheck.run({
       topLevelDomains: ['com', 'net', 'org', 'edu'],

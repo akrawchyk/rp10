@@ -13,7 +13,7 @@ export class EmailExportService {
     return this.http
       .post(this.emailsUrl, body)
       .toPromise()
-      .then(response => response.json().data)
+      .then(response => response.json())
       .catch(this.handleError)
   }
 
