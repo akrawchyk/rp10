@@ -7,6 +7,7 @@ import 'rxjs/add/operator/toPromise'
 export class EmailExportService {
   constructor(private http: Http) {}
 
+  // private emailsUrl = 'https://strive-swim.herokuapp.com/emails'
   private emailsUrl = 'http://localhost:4000/emails'
 
   newEmail(body): Promise<any> {

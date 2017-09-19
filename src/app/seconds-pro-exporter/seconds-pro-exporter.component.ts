@@ -1,11 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 
-// import { Mailcheck } from 'mailcheck'
-import * as mailcheck from 'mailcheck';
+import * as mailcheck from 'mailcheck'
 
 import { EmailExportService } from '../email-export.service'
-import { Rp10 } from '../rp10'
+import { Rp10, formatDurationDisplay } from '../rp10'
 
 @Component({
   selector: 'app-seconds-pro-exporter',
@@ -40,7 +39,7 @@ export class SecondsProExporterComponent implements OnInit {
     private fb: FormBuilder
   ) {
     this.form = fb.group({
-      email: ['', Validators.email]
+      email: ['', Validators.email],
     })
   }
 
@@ -51,22 +50,46 @@ export class SecondsProExporterComponent implements OnInit {
   onClick() {
     this.loading = true
     this.errorMessage = ''
+    this.successMessage = ''
 
     // export rp10 -> .seconds -> POST
-    const secondsFormat = this.rp10
-      .toSecondsProFormat()
-      .map(secondsFormat => {
-        const name = secondsFormat.name.split(' ').join('_')
-        return {
-          name: `${name}_RP10_export.seconds`,
-          seconds: secondsFormat,
-        }
-      })
+    const secondsFormat = this.rp10.toSecondsProFormat().map(secondsFormat => {
+      const name = secondsFormat.name.split(' ').join('_')
+      return {
+        name: `${name}_RP10_export.seconds`,
+        seconds: secondsFormat,
+      }
+    })
 
     const body = {
       emailAddress: this.form.value.email,
-      data: JSON.stringify(secondsFormat)
+      // XXX
+      emailIntro: `All groups: ${this.rp10.repCount}x${this.rp10
+        .todaysRepeats} (${this.rp10.restPerRepeat}s rest at ${this.rp10
+        .percentGoalPaceToTrainToday})`,
+      emailBody: this.rp10.goalTimes
+        .map((goalTime, idx) => {
+          const name = goalTime.name || `Group ${idx + 1}`
+          const target = this.rp10.getTargetForGoalTime(goalTime)
+          const interval = this.rp10.getIntervalForGoalTime(goalTime)
+          const totalSetTime = interval * this.rp10.repCount
+          const goalPoolType = this.rp10.myGoalTimeIsFor[
+            this.rp10.myGoalTimeIsFor.length - 1
+          ].toLowerCase()
+
+          return `
+        ${name}
+        Target: ${formatDurationDisplay(target)} - Interval @ ${formatDurationDisplay(interval)}
+        Goal time: ${goalTime.distance}${goalPoolType} @ ${formatDurationDisplay(goalTime.duration)}
+        Total set time: ${formatDurationDisplay(totalSetTime)}
+        `
+        })
+        .join('\n'),
+      // XXX
+      data: JSON.stringify(secondsFormat),
     }
+
+    console.log(body)
 
     this.emailExportService
       .newEmail(body)
@@ -94,7 +117,7 @@ export class SecondsProExporterComponent implements OnInit {
       },
       empty: () => {
         this.mailcheckSuggestion = ''
-      }
+      },
     })
   }
 
