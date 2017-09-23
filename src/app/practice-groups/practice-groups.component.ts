@@ -1,6 +1,6 @@
 import { Component, OnChanges, OnInit, Input } from '@angular/core'
 
-import { Rp10  } from '../rp10'
+import { Rp10, formatDurationDisplay } from '../rp10'
 
 @Component({
   selector: 'app-practice-groups',

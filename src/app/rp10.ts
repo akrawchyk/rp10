@@ -172,7 +172,6 @@ export class GoalTime {
       .replace(/:/g, ' ')
       .trim()
       .split(' ')
-      .filter(exists => !!+exists)
 
     if (!split.length || split.length > 3) {
       throw new TypeError(
@@ -210,25 +209,6 @@ export class GoalTime {
   toString(): string {
     return [this.displayDuration, this.distance, this.name].join(' ')
   }
-}
-
-class SecondsProIntervalFormat {
-  constructor(
-    public name: string,
-    public duration: number,
-    public color: number = 3
-  ) {}
-}
-
-class SecondsProFormat {
-  constructor(
-    public name: string,
-    public intervals: SecondsProIntervalFormat[],
-    public numberOfSets: number = 1,
-    public type: number = 0,
-    public soundScheme: number = 8,
-    public via: string = 'web'
-  ) {}
 }
 
 export class Rp10 {
@@ -275,29 +255,5 @@ export class Rp10 {
         poolType(this.todayMyTrainingPoolIs).to(this.myGoalTimeIsFor) +
       this.goalPlusMinus
     )
-  }
-
-  toSecondsProFormat(): SecondsProFormat[] {
-    return this.goalTimes.map((goalTime, idx) => {
-      const interval = this.getIntervalForGoalTime(goalTime)
-      const target = this.getTargetForGoalTime(goalTime)
-      const name = goalTime.name || `Group ${idx + 1}`
-      const intervals = []
-      while (intervals.length !== this.repCount) {
-        intervals.push(this.repCount)
-      }
-      // XXX why doesnt this work? always get array of undefined
-      // intervals.length = this.repCount
-      // intervals.map...
-
-      return new SecondsProFormat(
-        name,
-        intervals.map((repCount, jdx) => {
-          const iname = `rep ${jdx + 1} -> ${repCount}x${this
-            .todaysRepeats} target: ${formatDurationDisplay(target)}`
-          return new SecondsProIntervalFormat(iname, interval)
-        })
-      )
-    })
   }
 }

@@ -52,47 +52,21 @@ export class SecondsProExporterComponent implements OnInit {
     this.errorMessage = ''
     this.successMessage = ''
 
-    // export rp10 -> .seconds -> POST
-    const secondsFormat = this.rp10.toSecondsProFormat().map(secondsFormat => {
-      const name = secondsFormat.name.split(' ').join('_')
-      return {
-        name: `${name}_RP10_export.seconds`,
-        seconds: secondsFormat,
-      }
-    })
-
-    const body = {
+    const { goalTimes, ...rp10 } = this.rp10
+    const payload = {
       emailAddress: this.form.value.email,
-      // XXX
-      emailIntro: `All groups: ${this.rp10.repCount}x${this.rp10
-        .todaysRepeats} (${this.rp10.restPerRepeat}s rest at ${this.rp10
-        .percentGoalPaceToTrainToday})`,
-      emailBody: this.rp10.goalTimes
-        .map((goalTime, idx) => {
-          const name = goalTime.name || `Group ${idx + 1}`
-          const target = this.rp10.getTargetForGoalTime(goalTime)
-          const interval = this.rp10.getIntervalForGoalTime(goalTime)
-          const totalSetTime = interval * this.rp10.repCount
-          const goalPoolType = this.rp10.myGoalTimeIsFor[
-            this.rp10.myGoalTimeIsFor.length - 1
-          ].toLowerCase()
-
-          return `
-        ${name}
-        Target: ${formatDurationDisplay(target)} - Interval @ ${formatDurationDisplay(interval)}
-        Goal time: ${goalTime.distance}${goalPoolType} @ ${formatDurationDisplay(goalTime.duration)}
-        Total set time: ${formatDurationDisplay(totalSetTime)}
-        `
-        })
-        .join('\n'),
-      // XXX
-      data: JSON.stringify(secondsFormat),
+      rp10,
+      goalTimes: goalTimes.map(goalTime => {
+        return {
+          ...goalTime,
+          target: this.rp10.getTargetForGoalTime(goalTime),
+          interval: this.rp10.getIntervalForGoalTime(goalTime),
+        }
+      }),
     }
 
-    console.log(body)
-
     this.emailExportService
-      .newEmail(body)
+      .newEmail(payload)
       .then(res => {
         this.errorMessage = ''
         this.successMessage = res.message

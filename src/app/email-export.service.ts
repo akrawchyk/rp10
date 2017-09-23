@@ -7,19 +7,18 @@ import 'rxjs/add/operator/toPromise'
 export class EmailExportService {
   constructor(private http: Http) {}
 
-  // private emailsUrl = 'https://strive-swim.herokuapp.com/emails'
-  private emailsUrl = 'http://localhost:4000/emails'
+  // private emailsUrl = 'https://strive-swim.herokuapp.com/rp10/new'
+  private rp10Url = 'http://localhost:4000/rp10s/new'
 
   newEmail(body): Promise<any> {
     return this.http
-      .post(this.emailsUrl, body)
+      .post(this.rp10Url, body)
       .toPromise()
       .then(response => response.json())
       .catch(this.handleError)
   }
 
   private handleError(error: any): Promise<any> {
-    console.error('An error occurred', error) // for demo purposes only
     return Promise.reject(error.message || error)
   }
 }
