@@ -5,4 +5,6 @@
 
 export const environment = {
   production: false,
+
+  rp10Url: 'http://localhost:4000/rp10s/new'
 }
