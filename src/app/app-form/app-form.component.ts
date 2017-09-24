@@ -83,7 +83,7 @@ export class AppFormComponent implements OnInit {
       goalTimes = goalTimes
         .split('\n')
         .filter(line => line.trim())
-        .map(GoalTime.fromString),
+        .map(GoalTime.fromString)
 
       this.rp10 = new Rp10(
         todaysRepeats,
@@ -114,11 +114,29 @@ export class AppFormComponent implements OnInit {
         return interval > slowest ? interval : slowest
       }, 0)
 
-    // generate n intervals 5 seconds apart
     const intervals = []
-    for (let i = 0; i < 25; i++) {
-      intervals.push(slowestInterval + i * 5)
-    }
+
+    // generate nearest multiple of :15 from slowest pace
+    intervals.push(this.roundUp(slowestInterval, 15))
+    // then up to nearest :30 above that
+    intervals.push(this.roundUp(intervals[0], 30))
+    // then +:30 above that
+    intervals.push(intervals[1] + 30)
+    // then next nearest minute above that
+    intervals.push(this.roundUp(intervals[2], 60))
+
     this.intervalChoices = intervals
+  }
+
+  private roundUp(num, rounder) {
+    if (rounder == 0) {
+      return
+    }
+
+    if (num % rounder == 0) {
+      return num + rounder
+    }
+
+    return Math.ceil(num / rounder) * rounder
   }
 }
