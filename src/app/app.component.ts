@@ -6,7 +6,7 @@ import { Rp10 } from './rp10'
   selector: 'app-root',
   template: `
     <md-toolbar color="primary">
-      <span class="logo"><img class="logo-img" src="/assets/strive-logo.png" alt="Strive Swim logo"></span>
+      <span class="logo"><img class="logo-img" src="/assets/images/strive-logo.png" alt="Strive Swim logo"></span>
       <span>RP10</span>
     </md-toolbar>
     <div class="wrap">
