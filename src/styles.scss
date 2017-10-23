@@ -18,8 +18,20 @@ $custom-typography: mat-typography-config(
 // hue.
 // primary: #0e5a64
 // accent: #99c5c3
-$rp10-app-primary: mat-palette($mat-teal, 900);
-$rp10-app-accent:  mat-palette($mat-blue-grey, 300);
+$rp10-palette: (
+ 100: #b2dfdb,
+ 500: #175b64,
+ 700: #00796b,
+ contrast: (
+  100: $black-87-opacity,
+  500: white,
+  700: white,
+ )
+);
+$rp10-app-primary: mat-palette($rp10-palette);
+$rp10-app-accent:  mat-palette($mat-blue-grey);
+
+@debug $rp10-app-primary;
 
 // The warn palette is optional (defaults to red).
 $rp10-app-warn:    mat-palette($mat-red);
